@@ -1,0 +1,78 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Composer\XdebugHandler\XdebugHandler;
+use SavinMikhail\ExportIgnore\Command\CheckCommand;
+use Symfony\Component\Console\Application;
+
+// Display all errors and warnings
+error_reporting(E_ALL);
+ini_set('display_errors', 'stderr');
+
+// Check for opcache.save_comments directive
+if (function_exists('opcache_get_configuration')) {
+    $opcacheConfig = opcache_get_configuration();
+    if (isset($opcacheConfig['directives']['opcache.save_comments']) && !$opcacheConfig['directives']['opcache.save_comments']) {
+        fwrite(STDERR, 'Warning: The "opcache.save_comments" directive is disabled. Doc comments will not be available.' . PHP_EOL);
+    }
+}
+
+// Ensure timezone is set
+if (!ini_get('date.timezone')) {
+    date_default_timezone_set('UTC');
+}
+
+// @ intentionally: continue anyway
+@ini_set('memory_limit', '-1');
+
+// Check php setup for cli arguments
+if (!isset($_SERVER['argv']) && !isset($argv)) {
+    fwrite(STDERR, 'Please enable the "register_argc_argv" directive in your php.ini' . PHP_EOL);
+    exit(1);
+}
+
+if (!isset($argv)) {
+    $argv = $_SERVER['argv'];
+}
+
+// Determine the correct path to the autoload file
+$autoloadFiles = [
+    'dev' => __DIR__ . '/../vendor/autoload.php', // Development context
+    'prod' => __DIR__ . '/../../../../vendor/autoload.php',  // Installed as dependency
+];
+
+$autoloadFound = false;
+foreach ($autoloadFiles as $environment => $autoloadFile) {
+    if (file_exists($autoloadFile)) {
+        require $autoloadFile;
+        $autoloadFound = true;
+        define('COMMENTS_DENSITY_ENVIRONMENT', $environment);
+        break;
+    }
+}
+
+if (!$autoloadFound) {
+    fwrite(STDERR, 'Error: Could not find the autoload file' . PHP_EOL);
+    exit(1);
+}
+
+// Performance boosting
+if (COMMENTS_DENSITY_ENVIRONMENT === 'prod') {
+    $xdebug = new XdebugHandler('comments_density');
+    $xdebug->check();
+    unset($xdebug);
+}
+
+// Setup commands
+$app = new Application();
+$app->add(new CheckCommand());
+
+// Run the application
+try {
+    $app->run();
+} catch (Exception $e) {
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . PHP_EOL);
+    exit(1);
+}
