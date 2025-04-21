@@ -2,23 +2,57 @@
 <?php
 
 declare(strict_types=1);
+declare(ticks = 1); // ensures signal checks happen between statements
 
-const WORK_DIR = __DIR__ . '/.temp-packages';
+const ANALYZED_FILE = __DIR__ . '/var/analyzed.json';
+
+const WORK_DIR = __DIR__ . '/var/.temp-packages';
 const CHECK_CMD = __DIR__ . '/bin/export-ignore';
-const RESULT_FILE = __DIR__ . '/results.json';
+const RESULT_FILE = __DIR__ . '/var/results.json';
 
-@mkdir(WORK_DIR, 0777, true);
+mkdir(WORK_DIR, 0777, true);
 
-function fetchTopPackages(int $limit = 10): array
+$interrupted = false;
+
+pcntl_signal(SIGINT, static function () use (&$interrupted) {
+    echo "\n⛔️ Interrupted. Finishing up...\n";
+    $interrupted = true;
+});
+
+function loadAnalyzed(): array
 {
-    $url = "https://packagist.org/explore/popular.json?per_page={$limit}";
-    $json = file_get_contents($url);
-    if (!$json) {
-        throw new RuntimeException('Failed to fetch packagist data');
+    if (!file_exists(ANALYZED_FILE)) {
+        return [];
     }
 
-    $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-    return array_map(fn($pkg) => $pkg['name'], $data['packages']);
+    return json_decode(file_get_contents(ANALYZED_FILE), true, 512, JSON_THROW_ON_ERROR);
+}
+
+function fetchTopPackages(int $limit = 1000): array
+{
+    $packages = [];
+    $perPage = 100;
+    $pages = (int) ceil($limit / $perPage);
+
+    for ($page = 1; $page <= $pages; $page++) {
+        $url = "https://packagist.org/explore/popular.json?per_page={$perPage}&page={$page}";
+        $json = file_get_contents($url);
+
+        if (!$json) {
+            throw new RuntimeException("Failed to fetch Packagist data for page {$page}");
+        }
+
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        $pagePackages = array_map(fn($pkg) => $pkg['name'], $data['packages']);
+        $packages = array_merge($packages, $pagePackages);
+
+        // Stop early if we already have enough
+        if (count($packages) >= $limit) {
+            break;
+        }
+    }
+
+    return array_slice($packages, 0, $limit);
 }
 
 function installPackage(string $package, int $index, int $total): ?string
@@ -78,14 +112,21 @@ function saveFailures(array $failures): void
 }
 
 echo "🔍 Checking top Packagist packages...\n";
-$packages = fetchTopPackages(100);
+$packages = fetchTopPackages(1_000);
 
 $results = [];
 $failures = [];
 
 $total = count($packages);
 
-foreach ($packages as $i => $package) {
+$analyzed = loadAnalyzed();
+
+$newPackages = array_filter($packages, static fn($p) => !isset($analyzed[$p]));
+
+foreach (array_values($newPackages) as $i => $package) {
+    if ($interrupted) {
+        break;
+    }
     $vendorPath = installPackage($package, $i + 1, $total);
 
     if (!$vendorPath || !is_dir($vendorPath)) {
@@ -109,3 +150,6 @@ foreach ($results as $package => $status) {
 }
 
 saveFailures($failures);
+
+$allAnalyzed = array_merge($analyzed, $results);
+file_put_contents(ANALYZED_FILE, json_encode($allAnalyzed, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
