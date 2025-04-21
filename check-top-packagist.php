@@ -4,6 +4,8 @@
 declare(strict_types=1);
 declare(ticks = 1); // ensures signal checks happen between statements
 
+require __DIR__ . '/vendor/autoload.php';
+
 const ANALYZED_FILE = __DIR__ . '/var/analyzed.json';
 
 const WORK_DIR = __DIR__ . '/var/.temp-packages';
@@ -75,7 +77,7 @@ JSON;
 
     file_put_contents("$dir/composer.json", $composerJson);
 
-    exec("cd $dir && composer install --no-interaction --quiet 2>&1", $output, $exitCode);
+    exec("cd $dir && composer install --no-interaction --quiet --prefer-dist --no-scripts 2>&1", $output, $exitCode);
 
     return $exitCode === 0 ? $dir . '/vendor/' . $package : null;
 }
