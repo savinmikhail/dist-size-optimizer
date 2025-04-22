@@ -10,6 +10,7 @@ return [
 
     'CODE_OF_CONDUCT.md',
     'CONTRIBUTING.md',
+    'CHANGELOG.md',
 
     'phpcs.xml',
     'phpcs.xml.dist',
@@ -28,6 +29,7 @@ return [
 
     'psalm.xml',
     '.psalm/',
+    'psalm-baseline.xml',
 
     'composer-require-checker.json',
     'composer-unused.php',
@@ -51,6 +53,14 @@ return [
     'composer-dependency-analyser.php',
 
     '.gitlab-ci.yml',
+
+    '.travis.yml',
+
+    '.styleci.yml',
+
+    '/Tests',
+
+    'UPGRADE-*.md',
 
     'docker-compose.yaml',
     'docker-composee.yml',
