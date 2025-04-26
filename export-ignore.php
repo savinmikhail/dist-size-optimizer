@@ -3,6 +3,7 @@
 return [
     '.github/',
     'tests/',
+    'Tests/',
     'docs/',
 
     '.gitignore',
@@ -20,6 +21,7 @@ return [
 
     'phpstan-baseline.neon',
     'phpstan.neon.dist',
+    'phpstan.dist.neon',
     'phpstan.neon',
 
     'rector.php',
@@ -58,10 +60,8 @@ return [
 
     '.styleci.yml',
 
-    '/Tests',
-
     'UPGRADE-*.md',
 
     'docker-compose.yaml',
-    'docker-composee.yml',
+    'docker-compose.yml',
 ];
