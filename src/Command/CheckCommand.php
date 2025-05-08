@@ -33,17 +33,22 @@ final class CheckCommand extends Command
         $this
             ->setName('check')
             ->setDescription('Check which files and folders are not excluded via export-ignore')
-            ->addArgument('package', InputArgument::REQUIRED, 'Package name (e.g. vendor/package) or path to the vendor package (e.g. vendor/vendor-name/package-name)')
+            ->addArgument('package', InputArgument::REQUIRED, 'Package name (e.g. vendor/package)')
             ->addOption('json', null, InputOption::VALUE_NONE, 'Output results as JSON');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $package = $input->getArgument('package');
-        $path = $this->resolvePackagePath($package);
-        $patterns = require __DIR__ . '/../../export-ignore.php';
+        
+        if (!str_contains($package, '/')) {
+            throw new \InvalidArgumentException('Package must be in format vendor/package');
+        }
 
         try {
+            $path = $this->packageManager->downloadPackage($package);
+            $patterns = require __DIR__ . '/../../export-ignore.php';
+
             $result = $this->scanner->scan($path, $patterns);
 
             if (empty($result['files']) && empty($result['directories'])) {
@@ -62,24 +67,7 @@ final class CheckCommand extends Command
 
             return Command::FAILURE;
         } finally {
-            if ($package !== $path) {
-                $this->packageManager->cleanup();
-            }
+            $this->packageManager->cleanup();
         }
-    }
-
-    private function resolvePackagePath(string $package): string
-    {
-        // If it's a path, return it as is
-        if (is_dir($package)) {
-            return rtrim($package, '/');
-        }
-
-        // If it's a package name, download it
-        if (str_contains($package, '/')) {
-            return $this->packageManager->downloadPackage($package);
-        }
-
-        throw new \InvalidArgumentException('Package must be either a valid path or a package name in format vendor/package');
     }
 }

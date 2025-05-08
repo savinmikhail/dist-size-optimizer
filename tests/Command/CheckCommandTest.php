@@ -48,7 +48,7 @@ final class CheckCommandTest extends TestCase
     public function testCheckInvalidPackageName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Package must be either a valid path or a package name in format vendor/package');
+        $this->expectExceptionMessage('Package must be in format vendor/package');
 
         $input = new ArrayInput([
             'package' => 'invalid-package',
