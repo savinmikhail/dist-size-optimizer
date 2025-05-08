@@ -1,4 +1,7 @@
 {
+    "name": "savinmikhail/comments-density",
+    "description": "Checks that you have all non-production files excluded from dist",
+    "license": "MIT",
     "require": {
         "php": "^8.2",
         "symfony/console": "^7.2",
