@@ -35,11 +35,11 @@ final class CheckCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('check')
-            ->setDescription('Check which files and folders are not excluded via export-ignore')
-            ->addArgument('package', InputArgument::OPTIONAL, 'Package name (e.g. vendor/package). If not provided, checks current project')
-            ->addOption('json', null, InputOption::VALUE_NONE, 'Output results as JSON')
-            ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Path to config file with patterns to check', self::DEFAULT_CONFIG);
+            ->setName(name: 'check')
+            ->setDescription(description: 'Check which files and folders are not excluded via export-ignore')
+            ->addArgument(name: 'package', mode: InputArgument::OPTIONAL, description: 'Package name (e.g. vendor/package). If not provided, checks current project')
+            ->addOption(name: 'json', shortcut: null, mode: InputOption::VALUE_NONE, description: 'Output results as JSON')
+            ->addOption(name: 'config', shortcut: 'c', mode: InputOption::VALUE_REQUIRED, description: 'Path to config file with patterns to check', default: self::DEFAULT_CONFIG);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -47,37 +47,37 @@ final class CheckCommand extends Command
         $package = $input->getArgument('package');
         $configPath = $input->getOption('config');
 
-        if (!file_exists($configPath)) {
-            throw new InvalidArgumentException("Config file not found: {$configPath}");
+        if (!file_exists(filename: $configPath)) {
+            throw new InvalidArgumentException(message: "Config file not found: {$configPath}");
         }
 
         try {
             if ($package === null) {
                 $path = $this->packageManager->createGitArchive();
             } else {
-                if (!str_contains($package, '/')) {
-                    throw new InvalidArgumentException('Package must be in format vendor/package');
+                if (!str_contains(haystack: (string) $package, needle: '/')) {
+                    throw new InvalidArgumentException(message: 'Package must be in format vendor/package');
                 }
-                $path = $this->packageManager->downloadPackage($package);
+                $path = $this->packageManager->downloadPackage(packageName: $package);
             }
 
             $patterns = require $configPath;
 
-            $result = $this->scanner->scan($path, $patterns);
+            $result = $this->scanner->scan(packagePath: $path, patterns: $patterns);
 
-            if (count($result['files']) === 0 && count($result['directories']) === 0) {
+            if (count(value: $result['files']) === 0 && count(value: $result['directories']) === 0) {
                 $output->writeln('<info>No unnecessary files or directories found. All good!</info>');
 
                 return Command::SUCCESS;
             }
 
-            $totalSize = $this->calculator->calculateTotalSize($path, array_merge($result['files'], $result['directories']));
-            $humanSize = formatBytes($totalSize);
+            $totalSize = $this->calculator->calculateTotalSize(basePath: $path, paths: array_merge($result['files'], $result['directories']));
+            $humanSize = formatBytes(bytes: $totalSize);
 
             if ($input->getOption('json')) {
-                $this->jsonFormatter->output($output, $result, $totalSize, $humanSize);
+                $this->jsonFormatter->output(output: $output, result: $result, totalSizeBytes: $totalSize, humanReadableSize: $humanSize);
             } else {
-                $this->consoleFormatter->output($output, $result, $totalSize, $humanSize);
+                $this->consoleFormatter->output(output: $output, result: $result, totalSizeBytes: $totalSize, humanReadableSize: $humanSize);
             }
 
             return Command::FAILURE;

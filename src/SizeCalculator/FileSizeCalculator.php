@@ -15,12 +15,12 @@ final readonly class FileSizeCalculator
         $total = 0;
 
         foreach ($paths as $path) {
-            $fullPath = $basePath . '/' . rtrim($path, '/');
-            if (!file_exists($fullPath)) {
+            $fullPath = $basePath . '/' . rtrim(string: (string) $path, characters: '/');
+            if (!file_exists(filename: $fullPath)) {
                 continue;
             }
 
-            $total += $this->getSizeInBytes($fullPath);
+            $total += $this->getSizeInBytes(path: $fullPath);
         }
 
         return $total;
@@ -28,14 +28,14 @@ final readonly class FileSizeCalculator
 
     private function getSizeInBytes(string $path): int
     {
-        if (is_file($path)) {
-            return filesize($path);
+        if (is_file(filename: $path)) {
+            return filesize(filename: $path);
         }
 
         $size = 0;
         foreach (
             new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
+                iterator: new RecursiveDirectoryIterator(directory: $path, flags: FilesystemIterator::SKIP_DOTS),
             ) as $file
         ) {
             $size += $file->getSize();

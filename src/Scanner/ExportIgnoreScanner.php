@@ -15,22 +15,22 @@ final readonly class ExportIgnoreScanner
 
         foreach ($patterns as $pattern) {
             $fullPath = $packagePath . '/' . $pattern;
-            $normalized = rtrim($pattern, '/');
+            $normalized = rtrim(string: (string) $pattern, characters: '/');
 
-            if (is_dir($fullPath)) {
+            if (is_dir(filename: $fullPath)) {
                 $foundDirs[] = $pattern;
 
                 continue;
             }
 
-            if (is_file($fullPath)) {
+            if (is_file(filename: $fullPath)) {
                 $foundFiles[] = $pattern;
 
                 continue;
             }
 
             $finder = new Finder();
-            $finder->depth('== 0')->in($packagePath)->name(basename($pattern));
+            $finder->depth(levels: '== 0')->in(dirs: $packagePath)->name(patterns: basename(path: (string) $pattern));
 
             foreach ($finder as $file) {
                 if ($file->isDir()) {
@@ -42,8 +42,8 @@ final readonly class ExportIgnoreScanner
         }
 
         return [
-            'files' => array_unique($foundFiles),
-            'directories' => array_unique($foundDirs),
+            'files' => array_unique(array: $foundFiles),
+            'directories' => array_unique(array: $foundDirs),
         ];
     }
 }

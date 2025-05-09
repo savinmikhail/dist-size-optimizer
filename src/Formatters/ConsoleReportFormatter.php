@@ -28,7 +28,7 @@ final readonly class ConsoleReportFormatter
 
         $output->writeln('To fix this, add the following lines to your `.gitattributes` file:');
         foreach (array_merge($result['directories'], $result['files']) as $item) {
-            $output->writeln('  ' . rtrim($item, '/') . "\texport-ignore");
+            $output->writeln('  ' . rtrim(string: (string) $item, characters: '/') . "\texport-ignore");
         }
 
         if ($totalSizeBytes > 0) {

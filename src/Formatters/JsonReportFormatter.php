@@ -11,8 +11,8 @@ final readonly class JsonReportFormatter
     public function output(OutputInterface $output, array $result, int $totalSizeBytes, string $humanReadableSize): void
     {
         $suggestions = array_map(
-            static fn(string $path) => rtrim($path, '/') . "\texport-ignore",
-            array_merge($result['directories'], $result['files']),
+            callback: static fn(string $path) => rtrim(string: $path, characters: '/') . "\texport-ignore",
+            array: array_merge($result['directories'], $result['files']),
         );
 
         $data = [
@@ -23,6 +23,6 @@ final readonly class JsonReportFormatter
             'humanReadableSize' => $humanReadableSize,
         ];
 
-        $output->writeln(json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $output->writeln(json_encode(value: $data, flags: JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 }

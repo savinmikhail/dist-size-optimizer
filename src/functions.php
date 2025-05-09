@@ -10,9 +10,9 @@ function formatBytes(int $bytes, int $precision = 2): string
 {
     $units = ['B', 'KB', 'MB', 'GB'];
     $bytes = max($bytes, 0);
-    $pow = $bytes > 0 ? floor(log($bytes, 1024)) : 0;
-    $pow = min($pow, count($units) - 1);
+    $pow = $bytes > 0 ? floor(num: log(num: $bytes, base: 1024)) : 0;
+    $pow = min($pow, count(value: $units) - 1);
     $bytes /= (1024 ** $pow);
 
-    return round($bytes, $precision) . ' ' . $units[$pow];
+    return round(num: $bytes, precision: $precision) . ' ' . $units[$pow];
 }
