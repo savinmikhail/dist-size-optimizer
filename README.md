@@ -34,6 +34,8 @@ This will:
 2. Scan for files that should be excluded
 3. Show you what to add to your `.gitattributes` file
 
+> **Note**: When checking your current project, the tool uses `git archive HEAD`, which means it only includes committed changes. Make sure to commit your changes before running the check to get accurate results.
+
 ### Check Any Package
 
 To check any package from Packagist:
