@@ -33,7 +33,7 @@ final class CheckCommand extends Command
         $this
             ->setName('check')
             ->setDescription('Check which files and folders are not excluded via export-ignore')
-            ->addArgument('package', InputArgument::REQUIRED, 'Package name (e.g. vendor/package)')
+            ->addArgument('package', InputArgument::OPTIONAL, 'Package name (e.g. vendor/package). If not provided, checks current project')
             ->addOption('json', null, InputOption::VALUE_NONE, 'Output results as JSON');
     }
 
@@ -41,12 +41,16 @@ final class CheckCommand extends Command
     {
         $package = $input->getArgument('package');
         
-        if (!str_contains($package, '/')) {
-            throw new \InvalidArgumentException('Package must be in format vendor/package');
-        }
-
         try {
-            $path = $this->packageManager->downloadPackage($package);
+            if ($package === null) {
+                $path = $this->packageManager->createGitArchive();
+            } else {
+                if (!str_contains($package, '/')) {
+                    throw new \InvalidArgumentException('Package must be in format vendor/package');
+                }
+                $path = $this->packageManager->downloadPackage($package);
+            }
+
             $patterns = require __DIR__ . '/../../export-ignore.php';
 
             $result = $this->scanner->scan($path, $patterns);

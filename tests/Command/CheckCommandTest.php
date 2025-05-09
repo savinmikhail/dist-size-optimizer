@@ -26,6 +26,24 @@ final class CheckCommandTest extends TestCase
         $this->packageManager->cleanup();
     }
 
+    public function testCheckCurrentProject(): void
+    {
+        $input = new ArrayInput([
+            '--json' => true,
+        ]);
+        $output = new BufferedOutput();
+
+        $exitCode = $this->command->run($input, $output);
+
+        $this->assertNotEquals(0, $exitCode);
+        $result = json_decode($output->fetch(), true);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('files', $result);
+        $this->assertArrayHasKey('directories', $result);
+        $this->assertArrayHasKey('totalSizeBytes', $result);
+        $this->assertArrayHasKey('humanReadableSize', $result);
+    }
+
     public function testCheckPackageByName(): void
     {
         $input = new ArrayInput([

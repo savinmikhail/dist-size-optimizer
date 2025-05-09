@@ -49,6 +49,37 @@ JSON;
         return $vendorPath;
     }
 
+    public function createGitArchive(): string
+    {
+        $dir = self::WORK_DIR . '/current-project';
+        @mkdir($dir, 0777, true);
+
+        // Get the current git root directory
+        exec('git rev-parse --show-toplevel', $output, $exitCode);
+        if ($exitCode !== 0) {
+            throw new RuntimeException('Not a git repository');
+        }
+        $gitRoot = trim($output[0]);
+
+        // Create archive
+        $archivePath = $dir . '/archive.tar';
+        exec("cd {$gitRoot} && git archive --format=tar HEAD -o {$archivePath}", $output, $exitCode);
+        if ($exitCode !== 0) {
+            throw new RuntimeException('Failed to create git archive');
+        }
+
+        // Extract archive
+        exec("cd {$dir} && tar xf {$archivePath}", $output, $exitCode);
+        if ($exitCode !== 0) {
+            throw new RuntimeException('Failed to extract git archive');
+        }
+
+        // Clean up archive file
+        unlink($archivePath);
+
+        return $dir;
+    }
+
     public function cleanup(): void
     {
         exec('rm -rf ' . escapeshellarg(self::WORK_DIR));
