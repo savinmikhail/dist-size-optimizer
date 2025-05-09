@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace SavinMikhail\ExportIgnore\Formatters;
+
 use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class ConsoleReportFormatter

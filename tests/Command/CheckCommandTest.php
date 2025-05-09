@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SavinMikhail\ExportIgnore\Tests\Command;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use SavinMikhail\ExportIgnore\Command\CheckCommand;
 use SavinMikhail\ExportIgnore\PackageManager\PackageManager;
@@ -13,14 +14,16 @@ use Symfony\Component\Console\Output\BufferedOutput;
 final class CheckCommandTest extends TestCase
 {
     private CheckCommand $command;
+
     private PackageManager $packageManager;
+
     private string $testConfigPath;
 
     protected function setUp(): void
     {
         $this->packageManager = new PackageManager();
         $this->command = new CheckCommand();
-        
+
         // Create a test config file
         $this->testConfigPath = sys_get_temp_dir() . '/test-export-ignore.php';
         file_put_contents($this->testConfigPath, '<?php return ["tests/", ".gitignore"];');
@@ -43,13 +46,13 @@ final class CheckCommandTest extends TestCase
 
         $exitCode = $this->command->run($input, $output);
 
-        $this->assertNotEquals(0, $exitCode);
+        self::assertNotEquals(0, $exitCode);
         $result = json_decode($output->fetch(), true);
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('files', $result);
-        $this->assertArrayHasKey('directories', $result);
-        $this->assertArrayHasKey('totalSizeBytes', $result);
-        $this->assertArrayHasKey('humanReadableSize', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('files', $result);
+        self::assertArrayHasKey('directories', $result);
+        self::assertArrayHasKey('totalSizeBytes', $result);
+        self::assertArrayHasKey('humanReadableSize', $result);
     }
 
     public function testCheckPackageByName(): void
@@ -62,18 +65,18 @@ final class CheckCommandTest extends TestCase
 
         $exitCode = $this->command->run($input, $output);
 
-        $this->assertNotEquals(0, $exitCode);
+        self::assertNotEquals(0, $exitCode);
         $result = json_decode($output->fetch(), true);
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('files', $result);
-        $this->assertArrayHasKey('directories', $result);
-        $this->assertArrayHasKey('totalSizeBytes', $result);
-        $this->assertArrayHasKey('humanReadableSize', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('files', $result);
+        self::assertArrayHasKey('directories', $result);
+        self::assertArrayHasKey('totalSizeBytes', $result);
+        self::assertArrayHasKey('humanReadableSize', $result);
     }
 
     public function testCheckInvalidPackageName(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Package must be in format vendor/package');
 
         $input = new ArrayInput([
@@ -94,16 +97,16 @@ final class CheckCommandTest extends TestCase
 
         $exitCode = $this->command->run($input, $output);
 
-        $this->assertNotEquals(0, $exitCode);
+        self::assertNotEquals(0, $exitCode);
         $result = json_decode($output->fetch(), true);
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('files', $result);
-        $this->assertArrayHasKey('directories', $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('files', $result);
+        self::assertArrayHasKey('directories', $result);
     }
 
     public function testCheckWithNonExistentConfig(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Config file not found: /non-existent-config.php');
 
         $input = new ArrayInput([
@@ -113,4 +116,4 @@ final class CheckCommandTest extends TestCase
 
         $this->command->run($input, $output);
     }
-} 
+}

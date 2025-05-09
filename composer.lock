@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "57dc93111357b6812555f171ede45f9e",
+    "content-hash": "b0a2edccd755fa0275f820bf26811cc7",
     "packages": [
         {
             "name": "psr/container",
@@ -1941,6 +1941,60 @@
                 }
             ],
             "time": "2025-05-02T06:46:24+00:00"
+        },
+        {
+            "name": "phpyh/coding-standard",
+            "version": "2.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpyh/coding-standard.git",
+                "reference": "274f6d89121b834bfe179b6b9a8347859029b6d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpyh/coding-standard/zipball/274f6d89121b834bfe179b6b9a8347859029b6d7",
+                "reference": "274f6d89121b834bfe179b6b9a8347859029b6d7",
+                "shasum": ""
+            },
+            "require": {
+                "friendsofphp/php-cs-fixer": "^3.47.1",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "ergebnis/composer-normalize": "^2.43.0",
+                "icanhazstring/composer-unused": "^0.8.11",
+                "maglnet/composer-require-checker": "^4.7.1",
+                "rector/rector": "^1.2.4",
+                "vimeo/psalm": "^5.25.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPyh\\CodingStandard\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Valentin Udaltsov",
+                    "email": "udaltsov.valentin@gmail.com"
+                }
+            ],
+            "description": "PHPyh Coding Standard For PHP CS Fixer",
+            "keywords": [
+                "Static code analysis",
+                "fixer",
+                "standards",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/phpyh/coding-standard/issues",
+                "source": "https://github.com/phpyh/coding-standard/tree/2.6.2"
+            },
+            "time": "2024-09-03T06:59:17+00:00"
         },
         {
             "name": "psr/event-dispatcher",

@@ -2,7 +2,8 @@
 <?php
 
 declare(strict_types=1);
-declare(ticks = 1); // ensures signal checks happen between statements
+
+declare(ticks=1); // ensures signal checks happen between statements
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -15,7 +16,7 @@ const RESULT_FILE = __DIR__ . '/var/results.json';
 
 $interrupted = false;
 
-pcntl_signal(SIGINT, static function () use (&$interrupted) {
+pcntl_signal(SIGINT, static function () use (&$interrupted): void {
     echo "\n⛔️ Interrupted. Finishing up...\n";
     $interrupted = true;
 });
@@ -35,7 +36,7 @@ function fetchTopPackages(int $limit = 1000): array
     $perPage = 100;
     $pages = (int) ceil($limit / $perPage);
 
-    for ($page = 1; $page <= $pages; $page++) {
+    for ($page = 1; $page <= $pages; ++$page) {
         $url = "https://packagist.org/explore/popular.json?per_page={$perPage}&page={$page}";
         $json = file_get_contents($url);
 
@@ -44,7 +45,7 @@ function fetchTopPackages(int $limit = 1000): array
         }
 
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        $pagePackages = array_map(fn($pkg) => $pkg['name'], $data['packages']);
+        $pagePackages = array_map(static fn($pkg) => $pkg['name'], $data['packages']);
         $packages = array_merge($packages, $pagePackages);
 
         // Stop early if we already have enough
@@ -78,7 +79,7 @@ function runExportIgnoreCheck(string $package): array
         }
 
         return ['status' => '⚠️ Failed', 'details' => null];
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         return ['status' => '💥 Error: ' . $e->getMessage(), 'details' => null];
     }
 }
@@ -87,6 +88,7 @@ function saveFailures(array $failures): void
 {
     if (empty($failures)) {
         echo "\n✅ No export-ignore issues found. Great job, open source!\n";
+
         return;
     }
 

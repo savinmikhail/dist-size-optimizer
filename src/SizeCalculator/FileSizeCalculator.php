@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace SavinMikhail\ExportIgnore\SizeCalculator;
 
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 final readonly class FileSizeCalculator
 {
     public function calculateTotalSize(string $basePath, array $paths): int
@@ -30,8 +34,8 @@ final readonly class FileSizeCalculator
 
         $size = 0;
         foreach (
-            new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)
+            new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
             ) as $file
         ) {
             $size += $file->getSize();

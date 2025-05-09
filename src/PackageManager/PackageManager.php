@@ -13,29 +13,29 @@ final readonly class PackageManager
     public function __construct()
     {
         if (!is_dir(self::WORK_DIR)) {
-            mkdir(self::WORK_DIR, 0777, true);
+            mkdir(self::WORK_DIR, 0o777, true);
         }
     }
 
     public function downloadPackage(string $packageName): string
     {
         $dir = self::WORK_DIR . '/' . str_replace('/', '__', $packageName);
-        @mkdir($dir, 0777, true);
+        @mkdir($dir, 0o777, true);
 
         $composerJson = <<<JSON
-{
-    "name": "temp/export-ignore-check",
-    "require": {
-        "{$packageName}": "*"
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
-}
-JSON;
+            {
+                "name": "temp/export-ignore-check",
+                "require": {
+                    "{$packageName}": "*"
+                },
+                "minimum-stability": "stable",
+                "prefer-stable": true
+            }
+            JSON;
 
-        file_put_contents("$dir/composer.json", $composerJson);
+        file_put_contents("{$dir}/composer.json", $composerJson);
 
-        exec("cd $dir && composer install --no-interaction --quiet --prefer-dist --no-scripts 2>&1", $output, $exitCode);
+        exec("cd {$dir} && composer install --no-interaction --quiet --prefer-dist --no-scripts 2>&1", $output, $exitCode);
 
         if ($exitCode !== 0) {
             throw new RuntimeException("Failed to install package {$packageName}: " . implode("\n", $output));
@@ -52,7 +52,7 @@ JSON;
     public function createGitArchive(): string
     {
         $dir = self::WORK_DIR . '/current-project';
-        @mkdir($dir, 0777, true);
+        @mkdir($dir, 0o777, true);
 
         // Get the current git root directory
         exec('git rev-parse --show-toplevel', $output, $exitCode);
@@ -84,4 +84,4 @@ JSON;
     {
         exec('rm -rf ' . escapeshellarg(self::WORK_DIR));
     }
-} 
+}

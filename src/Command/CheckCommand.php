@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SavinMikhail\ExportIgnore\Command;
 
+use InvalidArgumentException;
 use SavinMikhail\ExportIgnore\Formatters\ConsoleReportFormatter;
 use SavinMikhail\ExportIgnore\Formatters\JsonReportFormatter;
 use SavinMikhail\ExportIgnore\PackageManager\PackageManager;
@@ -12,8 +13,9 @@ use SavinMikhail\ExportIgnore\SizeCalculator\FileSizeCalculator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
 use function SavinMikhail\ExportIgnore\formatBytes;
 
 final class CheckCommand extends Command
@@ -44,17 +46,17 @@ final class CheckCommand extends Command
     {
         $package = $input->getArgument('package');
         $configPath = $input->getOption('config');
-        
+
         if (!file_exists($configPath)) {
-            throw new \InvalidArgumentException("Config file not found: {$configPath}");
+            throw new InvalidArgumentException("Config file not found: {$configPath}");
         }
-        
+
         try {
             if ($package === null) {
                 $path = $this->packageManager->createGitArchive();
             } else {
                 if (!str_contains($package, '/')) {
-                    throw new \InvalidArgumentException('Package must be in format vendor/package');
+                    throw new InvalidArgumentException('Package must be in format vendor/package');
                 }
                 $path = $this->packageManager->downloadPackage($package);
             }
@@ -65,6 +67,7 @@ final class CheckCommand extends Command
 
             if (empty($result['files']) && empty($result['directories'])) {
                 $output->writeln('<info>No unnecessary files or directories found. All good!</info>');
+
                 return Command::SUCCESS;
             }
 

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace SavinMikhail\ExportIgnore\Formatters;
+
 use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class JsonReportFormatter
@@ -11,7 +12,7 @@ final readonly class JsonReportFormatter
     {
         $suggestions = array_map(
             static fn(string $path) => rtrim($path, '/') . "\texport-ignore",
-            array_merge($result['directories'], $result['files'])
+            array_merge($result['directories'], $result['files']),
         );
 
         $data = [

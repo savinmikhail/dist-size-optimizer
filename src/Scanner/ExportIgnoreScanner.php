@@ -19,11 +19,13 @@ final readonly class ExportIgnoreScanner
 
             if (is_dir($fullPath)) {
                 $foundDirs[] = $pattern;
+
                 continue;
             }
 
             if (is_file($fullPath)) {
                 $foundFiles[] = $pattern;
+
                 continue;
             }
 
