@@ -21,7 +21,7 @@ final readonly class ConsoleReportFormatter implements FormatterInterface
         if (!empty($violatingFilesAndDirs['files'])) {
             $output->writeln('<error>Files that should be excluded using export-ignore:</error>');
             foreach ($violatingFilesAndDirs['files'] as $file) {
-                $output->writeln("  • `/{$file}`");
+                $output->writeln("  • `{$file}`");
             }
             $output->writeln('');
         }

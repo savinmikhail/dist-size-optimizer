@@ -21,13 +21,13 @@ final readonly class ExportIgnoreScanner
             $normalized = rtrim(string: (string) $pattern, characters: '/');
 
             if (is_dir(filename: $fullPath)) {
-                $foundDirs[] = $pattern;
+                $foundDirs[] = '/' . $pattern; // we add leading slashes cuz we are working from the project root
 
                 continue;
             }
 
             if (is_file(filename: $fullPath)) {
-                $foundFiles[] = $pattern;
+                $foundFiles[] = '/' . $pattern;
 
                 continue;
             }
@@ -37,9 +37,9 @@ final readonly class ExportIgnoreScanner
 
             foreach ($finder as $file) {
                 if ($file->isDir()) {
-                    $foundDirs[] = $normalized . '/';
+                    $foundDirs[] = '/' . $normalized . '/';
                 } else {
-                    $foundFiles[] = $normalized;
+                    $foundFiles[] = '/' . $normalized;
                 }
             }
         }

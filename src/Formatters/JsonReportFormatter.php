@@ -11,7 +11,7 @@ final readonly class JsonReportFormatter implements FormatterInterface
     public function output(OutputInterface $output, array $violatingFilesAndDirs, int $totalSizeBytes, string $humanReadableSize): void
     {
         $suggestions = array_map(
-            callback: static fn(string $path) => '/' . rtrim(string: $path, characters: '/') . "\texport-ignore",
+            callback: static fn(string $path) => rtrim(string: $path, characters: '/') . "\texport-ignore",
             array: array_merge($violatingFilesAndDirs['directories'], $violatingFilesAndDirs['files']),
         );
 
