@@ -11,7 +11,8 @@
         "friendsofphp/php-cs-fixer": "^3.75",
         "symfony/var-dumper": "^7.2",
         "phpunit/phpunit": "^10.5",
-        "phpyh/coding-standard": "^2.6"
+        "phpyh/coding-standard": "^2.6",
+        "phpstan/phpstan": "^2.1"
     },
     "autoload": {
         "psr-4": {

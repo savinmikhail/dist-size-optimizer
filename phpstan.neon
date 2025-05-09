@@ -1,0 +1,8 @@
+parameters:
+	paths:
+		- src
+		- bin
+	level: 6
+	parallel:
+		maximumNumberOfProcesses: 1
+
