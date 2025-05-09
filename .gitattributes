@@ -2,3 +2,8 @@
 /.gitignore export-ignore
 /composer.lock export-ignore
 /check-top-packagist.php export-ignore
+/tests export-ignore
+/.php-cs-fixer.dist.php        export-ignore
+/phpstan.neon  export-ignore
+/phpunit.xml.dist      export-ignore
+/Makefile      export-ignore
