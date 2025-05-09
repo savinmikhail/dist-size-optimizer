@@ -11,6 +11,7 @@ use SavinMikhail\ExportIgnore\Formatters\JsonReportFormatter;
 use SavinMikhail\ExportIgnore\PackageManager\PackageManager;
 use SavinMikhail\ExportIgnore\Scanner\ExportIgnoreScanner;
 use SavinMikhail\ExportIgnore\SizeCalculator\FileSizeCalculator;
+use SavinMikhail\ExportIgnore\GitAttributesManager\GitAttributesManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,6 +30,7 @@ final class CheckCommand extends Command
         private readonly FileSizeCalculator $calculator = new FileSizeCalculator(),
         private FormatterInterface $formatter = new ConsoleReportFormatter(),
         private readonly PackageManager $packageManager = new PackageManager(),
+        private readonly GitAttributesManager $gitAttributesManager = new GitAttributesManager(),
     ) {
         parent::__construct();
     }
@@ -55,6 +57,12 @@ final class CheckCommand extends Command
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'Path to config file with patterns to check',
                 default: self::DEFAULT_CONFIG,
+            )
+            ->addOption(
+                name: 'dry-run',
+                shortcut: null,
+                mode: InputOption::VALUE_NONE,
+                description: 'Only show what would be added to .gitattributes without making changes',
             );
     }
 
@@ -62,6 +70,7 @@ final class CheckCommand extends Command
     {
         $package = $input->getArgument('package');
         $configPath = $input->getOption('config');
+        $isDryRun = $input->getOption('dry-run');
 
         if (!file_exists(filename: $configPath)) {
             throw new InvalidArgumentException(message: "Config file not found: {$configPath}");
@@ -105,6 +114,13 @@ final class CheckCommand extends Command
                 totalSizeBytes: $totalSize,
                 humanReadableSize: $humanSize,
             );
+
+            if (!$isDryRun && $package === null) {
+                $this->gitAttributesManager->appendPatterns($violatingFilesAndDirs);
+                $output->writeln('<info>Patterns have been added to .gitattributes</info>');
+            } elseif (!$isDryRun) {
+                $output->writeln('<comment>Note: --dry-run is ignored when checking a specific package</comment>');
+            }
 
             return Command::FAILURE;
         } finally {
