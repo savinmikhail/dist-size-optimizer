@@ -6,28 +6,28 @@ namespace SavinMikhail\ExportIgnore\Formatters;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-final readonly class ConsoleReportFormatter
+final readonly class ConsoleReportFormatter implements FormatterInterface
 {
-    public function output(OutputInterface $output, array $result, int $totalSizeBytes, string $humanReadableSize): void
+    public function output(OutputInterface $output, array $violatingFilesAndDirs, int $totalSizeBytes, string $humanReadableSize): void
     {
-        if (!empty($result['directories'])) {
+        if (!empty($violatingFilesAndDirs['directories'])) {
             $output->writeln('<error>Directories that should be excluded using export-ignore:</error>');
-            foreach ($result['directories'] as $dir) {
-                $output->writeln("  • `{$dir}`");
+            foreach ($violatingFilesAndDirs['directories'] as $dir) {
+                $output->writeln("  • `/{$dir}`");
             }
             $output->writeln('');
         }
 
-        if (!empty($result['files'])) {
+        if (!empty($violatingFilesAndDirs['files'])) {
             $output->writeln('<error>Files that should be excluded using export-ignore:</error>');
-            foreach ($result['files'] as $file) {
-                $output->writeln("  • `{$file}`");
+            foreach ($violatingFilesAndDirs['files'] as $file) {
+                $output->writeln("  • `/{$file}`");
             }
             $output->writeln('');
         }
 
         $output->writeln('To fix this, add the following lines to your `.gitattributes` file:');
-        foreach (array_merge($result['directories'], $result['files']) as $item) {
+        foreach (array_merge($violatingFilesAndDirs['directories'], $violatingFilesAndDirs['files']) as $item) {
             $output->writeln('  ' . rtrim(string: (string) $item, characters: '/') . "\texport-ignore");
         }
 

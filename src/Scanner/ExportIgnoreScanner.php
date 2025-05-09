@@ -8,6 +8,9 @@ use Symfony\Component\Finder\Finder;
 
 final readonly class ExportIgnoreScanner
 {
+    /**
+     * @return array{files: string[], folders: string[]}
+     */
     public function scan(string $packagePath, array $patterns): array
     {
         $foundFiles = [];

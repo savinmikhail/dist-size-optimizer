@@ -6,6 +6,7 @@ namespace SavinMikhail\ExportIgnore\Command;
 
 use InvalidArgumentException;
 use SavinMikhail\ExportIgnore\Formatters\ConsoleReportFormatter;
+use SavinMikhail\ExportIgnore\Formatters\FormatterInterface;
 use SavinMikhail\ExportIgnore\Formatters\JsonReportFormatter;
 use SavinMikhail\ExportIgnore\PackageManager\PackageManager;
 use SavinMikhail\ExportIgnore\Scanner\ExportIgnoreScanner;
@@ -16,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function count;
 use function SavinMikhail\ExportIgnore\formatBytes;
 
 final class CheckCommand extends Command
@@ -25,8 +27,7 @@ final class CheckCommand extends Command
     public function __construct(
         private readonly ExportIgnoreScanner $scanner = new ExportIgnoreScanner(),
         private readonly FileSizeCalculator $calculator = new FileSizeCalculator(),
-        private readonly JsonReportFormatter $jsonFormatter = new JsonReportFormatter(),
-        private readonly ConsoleReportFormatter $consoleFormatter = new ConsoleReportFormatter(),
+        private FormatterInterface $formatter = new ConsoleReportFormatter(),
         private readonly PackageManager $packageManager = new PackageManager(),
     ) {
         parent::__construct();
@@ -37,9 +38,24 @@ final class CheckCommand extends Command
         $this
             ->setName(name: 'check')
             ->setDescription(description: 'Check which files and folders are not excluded via export-ignore')
-            ->addArgument(name: 'package', mode: InputArgument::OPTIONAL, description: 'Package name (e.g. vendor/package). If not provided, checks current project')
-            ->addOption(name: 'json', shortcut: null, mode: InputOption::VALUE_NONE, description: 'Output results as JSON')
-            ->addOption(name: 'config', shortcut: 'c', mode: InputOption::VALUE_REQUIRED, description: 'Path to config file with patterns to check', default: self::DEFAULT_CONFIG);
+            ->addArgument(
+                name: 'package',
+                mode: InputArgument::OPTIONAL,
+                description: 'Package name (e.g. vendor/package). If not provided, checks current project',
+            )
+            ->addOption(
+                name: 'json',
+                shortcut: null,
+                mode: InputOption::VALUE_NONE,
+                description: 'Output results as JSON',
+            )
+            ->addOption(
+                name: 'config',
+                shortcut: 'c',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'Path to config file with patterns to check',
+                default: self::DEFAULT_CONFIG,
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -63,22 +79,32 @@ final class CheckCommand extends Command
 
             $patterns = require $configPath;
 
-            $result = $this->scanner->scan(packagePath: $path, patterns: $patterns);
+            $violatingFilesAndDirs = $this->scanner->scan(packagePath: $path, patterns: $patterns);
 
-            if (count(value: $result['files']) === 0 && count(value: $result['directories']) === 0) {
+            if (
+                count(value: $violatingFilesAndDirs['files']) === 0
+                && count(value: $violatingFilesAndDirs['directories']) === 0
+            ) {
                 $output->writeln('<info>No unnecessary files or directories found. All good!</info>');
 
                 return Command::SUCCESS;
             }
 
-            $totalSize = $this->calculator->calculateTotalSize(basePath: $path, paths: array_merge($result['files'], $result['directories']));
+            $totalSize = $this->calculator->calculateTotalSize(
+                basePath: $path,
+                paths: array_merge($violatingFilesAndDirs['files'], $violatingFilesAndDirs['directories']),
+            );
             $humanSize = formatBytes(bytes: $totalSize);
 
             if ($input->getOption('json')) {
-                $this->jsonFormatter->output(output: $output, result: $result, totalSizeBytes: $totalSize, humanReadableSize: $humanSize);
-            } else {
-                $this->consoleFormatter->output(output: $output, result: $result, totalSizeBytes: $totalSize, humanReadableSize: $humanSize);
+                $this->formatter = new JsonReportFormatter();
             }
+            $this->formatter->output(
+                output: $output,
+                violatingFilesAndDirs: $violatingFilesAndDirs,
+                totalSizeBytes: $totalSize,
+                humanReadableSize: $humanSize,
+            );
 
             return Command::FAILURE;
         } finally {

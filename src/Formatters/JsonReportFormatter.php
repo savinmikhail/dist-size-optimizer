@@ -6,18 +6,18 @@ namespace SavinMikhail\ExportIgnore\Formatters;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-final readonly class JsonReportFormatter
+final readonly class JsonReportFormatter implements FormatterInterface
 {
-    public function output(OutputInterface $output, array $result, int $totalSizeBytes, string $humanReadableSize): void
+    public function output(OutputInterface $output, array $violatingFilesAndDirs, int $totalSizeBytes, string $humanReadableSize): void
     {
         $suggestions = array_map(
-            callback: static fn(string $path) => rtrim(string: $path, characters: '/') . "\texport-ignore",
-            array: array_merge($result['directories'], $result['files']),
+            callback: static fn(string $path) => '/' . rtrim(string: $path, characters: '/') . "\texport-ignore",
+            array: array_merge($violatingFilesAndDirs['directories'], $violatingFilesAndDirs['files']),
         );
 
         $data = [
-            'files' => $result['files'],
-            'directories' => $result['directories'],
+            'files' => $violatingFilesAndDirs['files'],
+            'directories' => $violatingFilesAndDirs['directories'],
             'suggestions' => $suggestions,
             'totalSizeBytes' => $totalSizeBytes,
             'humanReadableSize' => $humanReadableSize,

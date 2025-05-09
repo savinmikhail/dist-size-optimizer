@@ -88,6 +88,7 @@ function saveFailures(array $failures): void
 {
     if (count($failures) === 0) {
         echo "\n✅ No export-ignore issues found. Great job, open source!\n";
+
         return;
     }
 
