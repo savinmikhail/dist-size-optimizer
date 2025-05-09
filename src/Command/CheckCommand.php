@@ -65,7 +65,7 @@ final class CheckCommand extends Command
 
             $result = $this->scanner->scan($path, $patterns);
 
-            if (empty($result['files']) && empty($result['directories'])) {
+            if (count($result['files']) === 0 && count($result['directories']) === 0) {
                 $output->writeln('<info>No unnecessary files or directories found. All good!</info>');
 
                 return Command::SUCCESS;

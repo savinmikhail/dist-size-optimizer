@@ -74,7 +74,7 @@ function runExportIgnoreCheck(string $package): array
             return ['status' => '✅ OK', 'details' => null];
         }
 
-        if (!empty($result['files']) || !empty($result['directories'])) {
+        if (isset($result['files']) && count($result['files']) > 0 || isset($result['directories']) && count($result['directories']) > 0) {
             return ['status' => '❌ Missing export-ignore', 'details' => $result];
         }
 
@@ -86,9 +86,8 @@ function runExportIgnoreCheck(string $package): array
 
 function saveFailures(array $failures): void
 {
-    if (empty($failures)) {
+    if (count($failures) === 0) {
         echo "\n✅ No export-ignore issues found. Great job, open source!\n";
-
         return;
     }
 
@@ -97,6 +96,7 @@ function saveFailures(array $failures): void
 }
 
 echo "🔍 Checking top Packagist packages...\n";
+
 $packages = fetchTopPackages(1_000);
 
 $results = [];
@@ -115,7 +115,7 @@ foreach (array_values($newPackages) as $i => $package) {
     $check = runExportIgnoreCheck($package);
     $results[$package] = $check['status'];
 
-    if ($check['status'] === '❌ Missing export-ignore' && $check['details']) {
+    if ($check['status'] === '❌ Missing export-ignore' && isset($check['details'])) {
         $failures[$package] = $check['details'];
     }
 }
