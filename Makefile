@@ -3,3 +3,6 @@ cs:
 
 phpstan:
 	vendor/bin/phpstan
+
+test:
+	vendor/bin/phpunit
