@@ -11,7 +11,7 @@ When you publish a package to Packagist, Composer creates a distribution archive
 - Improve CI/CD pipeline performance
 - Keep production packages clean
 
-This tool helps you identify what should be excluded.
+This tool helps you identify what should be excluded and can automatically fix your `.gitattributes` file.
 
 ## Installation
 
@@ -33,6 +33,7 @@ This will:
 1. Create a git archive of your project (simulating Packagist's distribution)
 2. Scan for files that should be excluded
 3. Show you what to add to your `.gitattributes` file
+4. Automatically append the suggested patterns to your `.gitattributes` file
 
 > **Note**: When checking your current project, the tool uses `git archive HEAD`, which means it only includes committed changes. Make sure to commit your changes before running the check to get accurate results.
 
@@ -50,6 +51,14 @@ bin/export-ignore check symfony/console
 ```
 
 ### Output Options
+
+#### Dry Run
+
+By default, the tool will automatically append suggested patterns to your `.gitattributes` file. Use `--dry-run` to only see what would be added without making any changes:
+
+```bash
+bin/export-ignore check --dry-run
+```
 
 #### JSON Output
 
@@ -85,24 +94,24 @@ return [
 
 ```
 Directories that should be excluded using export-ignore:
-  • `tests/`
-  • `docs/`
-  • `.github/`
+  • `/tests/`
+  • `/docs/`
+  • `/.github/`
 
 Files that should be excluded using export-ignore:
-  • `.gitignore`
-  • `.editorconfig`
-  • `phpunit.xml.dist`
-  • `README.md`
+  • `/.gitignore`
+  • `/.editorconfig`
+  • `/phpunit.xml.dist`
+  • `/README.md`
 
 To fix this, add the following lines to your `.gitattributes` file:
-  tests/	export-ignore
-  docs/	export-ignore
-  .github/	export-ignore
-  .gitignore	export-ignore
-  .editorconfig	export-ignore
-  phpunit.xml.dist	export-ignore
-  README.md	export-ignore
+  /tests/	export-ignore
+  /docs/	export-ignore
+  /.github/	export-ignore
+  /.gitignore	export-ignore
+  /.editorconfig	export-ignore
+  /phpunit.xml.dist	export-ignore
+  /README.md	export-ignore
 
 🌿 Your package size could be reduced by approximately 2.5 MB!
 🚀 This improves installation time, reduces archive size, and helps CI/CD pipelines.
