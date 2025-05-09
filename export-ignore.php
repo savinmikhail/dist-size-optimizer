@@ -13,8 +13,7 @@ return [
 
     'CODE_OF_CONDUCT.md',
     'CONTRIBUTING.md',
-    'CHANGELOG.md',
-
+    // we won't use CHANGELOG.md here
     'phpcs.xml',
     'phpcs.xml.dist',
     '.php-cs-fixer.dist.php',
