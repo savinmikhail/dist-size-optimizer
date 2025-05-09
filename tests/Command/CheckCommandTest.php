@@ -14,16 +14,24 @@ final class CheckCommandTest extends TestCase
 {
     private CheckCommand $command;
     private PackageManager $packageManager;
+    private string $testConfigPath;
 
     protected function setUp(): void
     {
         $this->packageManager = new PackageManager();
         $this->command = new CheckCommand();
+        
+        // Create a test config file
+        $this->testConfigPath = sys_get_temp_dir() . '/test-export-ignore.php';
+        file_put_contents($this->testConfigPath, '<?php return ["tests/", ".gitignore"];');
     }
 
     protected function tearDown(): void
     {
         $this->packageManager->cleanup();
+        if (file_exists($this->testConfigPath)) {
+            unlink($this->testConfigPath);
+        }
     }
 
     public function testCheckCurrentProject(): void
@@ -70,6 +78,36 @@ final class CheckCommandTest extends TestCase
 
         $input = new ArrayInput([
             'package' => 'invalid-package',
+        ]);
+        $output = new BufferedOutput();
+
+        $this->command->run($input, $output);
+    }
+
+    public function testCheckWithCustomConfig(): void
+    {
+        $input = new ArrayInput([
+            '--json' => true,
+            '--config' => $this->testConfigPath,
+        ]);
+        $output = new BufferedOutput();
+
+        $exitCode = $this->command->run($input, $output);
+
+        $this->assertNotEquals(0, $exitCode);
+        $result = json_decode($output->fetch(), true);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('files', $result);
+        $this->assertArrayHasKey('directories', $result);
+    }
+
+    public function testCheckWithNonExistentConfig(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Config file not found: /non-existent-config.php');
+
+        $input = new ArrayInput([
+            '--config' => '/non-existent-config.php',
         ]);
         $output = new BufferedOutput();
 

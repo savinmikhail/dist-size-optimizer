@@ -18,6 +18,8 @@ use function SavinMikhail\ExportIgnore\formatBytes;
 
 final class CheckCommand extends Command
 {
+    private const DEFAULT_CONFIG = __DIR__ . '/../../export-ignore.php';
+
     public function __construct(
         private readonly ExportIgnoreScanner $scanner = new ExportIgnoreScanner(),
         private readonly FileSizeCalculator $calculator = new FileSizeCalculator(),
@@ -34,12 +36,18 @@ final class CheckCommand extends Command
             ->setName('check')
             ->setDescription('Check which files and folders are not excluded via export-ignore')
             ->addArgument('package', InputArgument::OPTIONAL, 'Package name (e.g. vendor/package). If not provided, checks current project')
-            ->addOption('json', null, InputOption::VALUE_NONE, 'Output results as JSON');
+            ->addOption('json', null, InputOption::VALUE_NONE, 'Output results as JSON')
+            ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Path to config file with patterns to check', self::DEFAULT_CONFIG);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $package = $input->getArgument('package');
+        $configPath = $input->getOption('config');
+        
+        if (!file_exists($configPath)) {
+            throw new \InvalidArgumentException("Config file not found: {$configPath}");
+        }
         
         try {
             if ($package === null) {
@@ -51,7 +59,7 @@ final class CheckCommand extends Command
                 $path = $this->packageManager->downloadPackage($package);
             }
 
-            $patterns = require __DIR__ . '/../../export-ignore.php';
+            $patterns = require $configPath;
 
             $result = $this->scanner->scan($path, $patterns);
 
