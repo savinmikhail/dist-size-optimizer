@@ -6,3 +6,6 @@ phpstan:
 
 test:
 	vendor/bin/phpunit
+
+rector:
+	vendor/bin/rector process

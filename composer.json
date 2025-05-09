@@ -12,7 +12,9 @@
         "symfony/var-dumper": "^7.2",
         "phpunit/phpunit": "^10.5",
         "phpyh/coding-standard": "^2.6",
-        "phpstan/phpstan": "^2.1"
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.0",
+        "savinmikhail/add_named_arguments_rector": "^0.1.16"
     },
     "autoload": {
         "psr-4": {
