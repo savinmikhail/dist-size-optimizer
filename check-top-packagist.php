@@ -6,13 +6,12 @@ declare(ticks = 1); // ensures signal checks happen between statements
 
 require __DIR__ . '/vendor/autoload.php';
 
+use SavinMikhail\ExportIgnore\Command\CheckCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
+
 const ANALYZED_FILE = __DIR__ . '/var/analyzed.json';
-
-const WORK_DIR = __DIR__ . '/var/.temp-packages';
-const CHECK_CMD = __DIR__ . '/bin/export-ignore';
 const RESULT_FILE = __DIR__ . '/var/results.json';
-
-mkdir(WORK_DIR, 0777, true);
 
 $interrupted = false;
 
@@ -57,49 +56,31 @@ function fetchTopPackages(int $limit = 1000): array
     return array_slice($packages, 0, $limit);
 }
 
-function installPackage(string $package, int $index, int $total): ?string
+function runExportIgnoreCheck(string $package): array
 {
-    $dir = WORK_DIR . '/' . str_replace('/', '__', $package);
-    @mkdir($dir, 0777, true);
+    $command = new CheckCommand();
+    $input = new ArrayInput([
+        'package' => $package,
+        '--json' => true,
+    ]);
+    $output = new BufferedOutput();
 
-    echo "📦 [{$index}/{$total}] Installing {$package}...\n";
+    try {
+        $exitCode = $command->run($input, $output);
+        $result = json_decode($output->fetch(), true);
 
-    $composerJson = <<<JSON
-{
-    "name": "temp/export-ignore-check",
-    "require": {
-        "{$package}": "*"
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
-}
-JSON;
-
-    file_put_contents("$dir/composer.json", $composerJson);
-
-    exec("cd $dir && composer install --no-interaction --quiet --prefer-dist --no-scripts 2>&1", $output, $exitCode);
-
-    return $exitCode === 0 ? $dir . '/vendor/' . $package : null;
-}
-
-function runExportIgnoreCheck(string $vendorPath): array
-{
-    $cmd = sprintf('%s check %s --json', CHECK_CMD, escapeshellarg($vendorPath));
-    exec($cmd, $output, $code);
-
-    if ($code !== 0 && $output !== []) {
-        $json = json_decode(implode("\n", $output), true);
-        if ($json && (!empty($json['files']) || !empty($json['directories']))) {
-            return ['status' => '❌ Missing export-ignore', 'details' => $json];
+        if ($exitCode === 0) {
+            return ['status' => '✅ OK', 'details' => null];
         }
+
+        if (!empty($result['files']) || !empty($result['directories'])) {
+            return ['status' => '❌ Missing export-ignore', 'details' => $result];
+        }
+
+        return ['status' => '⚠️ Failed', 'details' => null];
+    } catch (\Exception $e) {
+        return ['status' => '💥 Error: ' . $e->getMessage(), 'details' => null];
     }
-
-    return ['status' => $code === 0 ? '✅ OK' : '⚠️ Failed', 'details' => null];
-}
-
-function cleanup(): void
-{
-    exec('rm -rf ' . escapeshellarg(WORK_DIR));
 }
 
 function saveFailures(array $failures): void
@@ -120,31 +101,22 @@ $results = [];
 $failures = [];
 
 $total = count($packages);
-
 $analyzed = loadAnalyzed();
-
 $newPackages = array_filter($packages, static fn($p) => !isset($analyzed[$p]));
 
 foreach (array_values($newPackages) as $i => $package) {
     if ($interrupted) {
         break;
     }
-    $vendorPath = installPackage($package, $i + 1, $total);
 
-    if (!$vendorPath || !is_dir($vendorPath)) {
-        $results[$package] = '💥 Install failed';
-        continue;
-    }
-
-    $check = runExportIgnoreCheck($vendorPath);
+    echo "📦 [{$i}/{$total}] Checking {$package}...\n";
+    $check = runExportIgnoreCheck($package);
     $results[$package] = $check['status'];
 
     if ($check['status'] === '❌ Missing export-ignore' && $check['details']) {
         $failures[$package] = $check['details'];
     }
 }
-
-cleanup();
 
 echo "\n📊 Results:\n";
 foreach ($results as $package => $status) {
