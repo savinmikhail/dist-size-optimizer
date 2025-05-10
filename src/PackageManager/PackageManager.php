@@ -8,18 +8,23 @@ use RuntimeException;
 
 final readonly class PackageManager
 {
-    private const WORK_DIR = __DIR__ . '/../../var/.temp-packages';
+    private string $workdir;
 
-    public function __construct()
+    public function setWorkdir(?string $workdir = null): void
     {
-        if (!is_dir(filename: self::WORK_DIR)) {
-            mkdir(directory: self::WORK_DIR, permissions: 0o777, recursive: true);
+        if (!$workdir) {
+            $workdir = \sys_get_temp_dir() . DIRECTORY_SEPARATOR . \md5(\microtime());
+        }
+        $this->workdir = $workdir;
+
+        if (!is_dir(filename: $this->workdir)) {
+            mkdir(directory: $this->workdir, permissions: 0o777, recursive: true);
         }
     }
 
     public function downloadPackage(string $packageName): string
     {
-        $dir = self::WORK_DIR . '/' . str_replace(search: '/', replace: '__', subject: $packageName);
+        $dir = $this->workdir . '/' . str_replace(search: '/', replace: '__', subject: $packageName);
         @mkdir(directory: $dir, permissions: 0o777, recursive: true);
 
         $composerJson = <<<JSON
@@ -51,7 +56,7 @@ final readonly class PackageManager
 
     public function createGitArchive(): string
     {
-        $dir = self::WORK_DIR . '/current-project';
+        $dir = $this->workdir . '/current-project';
         @mkdir(directory: $dir, permissions: 0o777, recursive: true);
 
         exec(command: "git archive --format=tar HEAD | tar -x -C {$dir} 2>&1", output: $output, result_code: $exitCode);
@@ -65,8 +70,8 @@ final readonly class PackageManager
 
     public function cleanup(): void
     {
-        if (is_dir(filename: self::WORK_DIR)) {
-            exec(command: 'rm -rf ' . escapeshellarg(arg: self::WORK_DIR));
+        if (is_dir(filename: $this->workdir)) {
+            exec(command: 'rm -rf ' . escapeshellarg(arg: $this->workdir));
         }
     }
 }

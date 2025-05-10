@@ -17,8 +17,17 @@ This tool helps you identify what should be excluded and can automatically fix y
 
 ## Installation
 
+1. As composer dependency:
+
 ```bash
 composer require savinmikhail/dist-size-optimizer
+```
+
+2. Also, you can use standalone phar package:
+
+```bash
+box.phar compile
+./dist-size-optimizer.phar check
 ```
 
 ## Usage
@@ -90,6 +99,16 @@ return [
     '.gitignore',
     // ... your patterns
 ];
+```
+
+#### Custom Working Directory
+
+By default, the tool uses a system temporary directory for working directory. You can provide your own working directory path:
+
+```bash
+vendor/bin/dist-size-optimizer check --workdir=/path/to/workdir
+# or using short option
+vendor/bin/dist-size-optimizer check -w /path/to/workdir
 ```
 
 ## Example Output
