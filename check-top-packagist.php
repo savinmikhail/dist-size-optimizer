@@ -7,7 +7,7 @@ declare(ticks=1); // ensures signal checks happen between statements
 
 require __DIR__ . '/vendor/autoload.php';
 
-use SavinMikhail\ExportIgnore\Command\CheckCommand;
+use SavinMikhail\DistSizeOptimizer\Command\CheckCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
