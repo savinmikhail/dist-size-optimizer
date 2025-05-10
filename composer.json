@@ -16,7 +16,8 @@
         "rector/rector": "^2.0",
         "savinmikhail/add_named_arguments_rector": "^0.1.16",
         "symfony/var-dumper": "^7.2",
-        "icanhazstring/composer-unused": "^0.9.3"
+        "icanhazstring/composer-unused": "^0.9.3",
+        "maglnet/composer-require-checker": "^4.16"
     },
     "autoload": {
         "psr-4": {

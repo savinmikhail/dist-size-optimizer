@@ -16,5 +16,8 @@ composer-normalize:
 composer-unused:
 	vendor/bin/composer-unused
 
-quality: cs rector composer-normalize composer-unused phpstan test
+composer-req:
+	vendor/bin/composer-require-checker check
+
+quality: cs rector composer-normalize composer-unused composer-req phpstan test
 
