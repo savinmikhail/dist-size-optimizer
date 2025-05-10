@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\Formatters;
+namespace SavinMikhail\DistSizeOptimizer\Formatters;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -13,7 +13,7 @@ final readonly class ConsoleReportFormatter implements FormatterInterface
         if (!empty($violatingFilesAndDirs['directories'])) {
             $output->writeln('<error>Directories that should be excluded using export-ignore:</error>');
             foreach ($violatingFilesAndDirs['directories'] as $dir) {
-                $output->writeln("  • `/{$dir}`");
+                $output->writeln("  • `{$dir}`");
             }
             $output->writeln('');
         }
@@ -26,9 +26,11 @@ final readonly class ConsoleReportFormatter implements FormatterInterface
             $output->writeln('');
         }
 
-        $output->writeln('To fix this, add the following lines to your `.gitattributes` file:');
-        foreach (array_merge($violatingFilesAndDirs['directories'], $violatingFilesAndDirs['files']) as $item) {
-            $output->writeln('  ' . rtrim(string: (string) $item, characters: '/') . "\texport-ignore");
+        if (!empty($violatingFilesAndDirs['directories']) || !empty($violatingFilesAndDirs['files'])) {
+            $output->writeln('To fix this, add the following lines to your `.gitattributes` file:');
+            foreach (array_merge($violatingFilesAndDirs['directories'], $violatingFilesAndDirs['files']) as $item) {
+                $output->writeln('  ' . rtrim(string: (string) $item, characters: '/') . "\texport-ignore");
+            }
         }
 
         if ($totalSizeBytes > 0) {

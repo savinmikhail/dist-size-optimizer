@@ -2,24 +2,26 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\GitAttributesManager;
+namespace SavinMikhail\DistSizeOptimizer\GitAttributesManager;
 
-class GitAttributesManager
+use function sprintf;
+
+final class GitAttributesManager
 {
     private const GITATTRIBUTES_FILE = '.gitattributes';
     private const EXPORT_IGNORE_PATTERN = 'export-ignore';
 
     public function appendPatterns(array $violatingFilesAndDirs): void
     {
-        $patterns = $this->generatePatterns($violatingFilesAndDirs);
-        
+        $patterns = $this->generatePatterns(violatingFilesAndDirs: $violatingFilesAndDirs);
+
         if (empty($patterns)) {
             return;
         }
 
         $content = $this->readGitAttributes();
-        $newContent = $this->appendPatternsToContent($content, $patterns);
-        $this->writeGitAttributes($newContent);
+        $newContent = $this->appendPatternsToContent(content: $content, patterns: $patterns);
+        $this->writeGitAttributes(content: $newContent);
     }
 
     private function generatePatterns(array $violatingFilesAndDirs): array
@@ -27,14 +29,14 @@ class GitAttributesManager
         $patterns = [];
 
         foreach ($violatingFilesAndDirs['files'] as $file) {
-            $patterns[] = $this->formatPattern($file);
+            $patterns[] = $this->formatPattern(path: $file);
         }
 
         foreach ($violatingFilesAndDirs['directories'] as $directory) {
-            $patterns[] = $this->formatPattern($directory . '/');
+            $patterns[] = $this->formatPattern(path: $directory . '/');
         }
 
-        return array_unique($patterns);
+        return array_unique(array: $patterns);
     }
 
     private function formatPattern(string $path): string
@@ -44,31 +46,31 @@ class GitAttributesManager
 
     private function readGitAttributes(): string
     {
-        if (!file_exists(self::GITATTRIBUTES_FILE)) {
+        if (!file_exists(filename: self::GITATTRIBUTES_FILE)) {
             return '';
         }
 
-        return file_get_contents(self::GITATTRIBUTES_FILE) ?: '';
+        return file_get_contents(filename: self::GITATTRIBUTES_FILE) ?: '';
     }
 
     private function appendPatternsToContent(string $content, array $patterns): string
     {
-        $existingPatterns = array_filter(explode("\n", $content));
+        $existingPatterns = array_filter(array: explode(separator: "\n", string: $content));
         $newPatterns = array_diff($patterns, $existingPatterns);
 
         if (empty($newPatterns)) {
             return $content;
         }
 
-        if (!empty($content) && !str_ends_with($content, "\n")) {
+        if (!empty($content) && !str_ends_with(haystack: $content, needle: "\n")) {
             $content .= "\n";
         }
 
-        return $content . implode("\n", $newPatterns) . "\n";
+        return $content . implode(separator: "\n", array: $newPatterns) . "\n";
     }
 
     private function writeGitAttributes(string $content): void
     {
-        file_put_contents(self::GITATTRIBUTES_FILE, $content);
+        file_put_contents(filename: self::GITATTRIBUTES_FILE, data: $content);
     }
-} 
+}

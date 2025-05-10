@@ -4,7 +4,7 @@
 declare(strict_types=1);
 
 use Composer\XdebugHandler\XdebugHandler;
-use SavinMikhail\ExportIgnore\Command\CheckCommand;
+use SavinMikhail\DistSizeOptimizer\Command\CheckCommand;
 use Symfony\Component\Console\Application;
 
 // Display all errors and warnings

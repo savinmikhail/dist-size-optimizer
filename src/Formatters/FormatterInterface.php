@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\Formatters;
+namespace SavinMikhail\DistSizeOptimizer\Formatters;
 
 use Symfony\Component\Console\Output\OutputInterface;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore;
+namespace SavinMikhail\DistSizeOptimizer;
 
 use function count;
 

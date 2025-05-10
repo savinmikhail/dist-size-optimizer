@@ -1,6 +1,8 @@
-# Export Ignore Check
+# Dist Size Optimizer
 
-A command-line tool that helps you identify files and directories that should be excluded from your Composer package distribution using `.gitattributes` export-ignore.
+A command-line tool that helps you optimize your package distribution size by automatically managing `.gitattributes` export-ignore rules.
+
+> **Note**: This package was previously known as `export-ignore-check`. The functionality remains the same, but the name better reflects its purpose of optimizing distribution size.
 
 ## Why?
 
@@ -16,7 +18,7 @@ This tool helps you identify what should be excluded and can automatically fix y
 ## Installation
 
 ```bash
-composer require savinmikhail/export-ignore-check
+composer require savinmikhail/dist-size-optimizer
 ```
 
 ## Usage
@@ -26,7 +28,7 @@ composer require savinmikhail/export-ignore-check
 To check your current project (recommended during development):
 
 ```bash
-bin/export-ignore check
+vendor/bin/dist-size-optimizer check
 ```
 
 This will:
@@ -42,12 +44,12 @@ This will:
 To check any package from Packagist:
 
 ```bash
-bin/export-ignore check vendor/package
+vendor/bin/dist-size-optimizer check vendor/package
 ```
 
 For example:
 ```bash
-bin/export-ignore check symfony/console
+vendor/bin/dist-size-optimizer check symfony/console
 ```
 
 ### Output Options
@@ -57,7 +59,7 @@ bin/export-ignore check symfony/console
 By default, the tool will automatically append suggested patterns to your `.gitattributes` file. Use `--dry-run` to only see what would be added without making any changes:
 
 ```bash
-bin/export-ignore check --dry-run
+vendor/bin/dist-size-optimizer check --dry-run
 ```
 
 #### JSON Output
@@ -65,7 +67,7 @@ bin/export-ignore check --dry-run
 Add `--json` flag to get machine-readable output:
 
 ```bash
-bin/export-ignore check --json
+vendor/bin/dist-size-optimizer check --json
 ```
 
 #### Custom Config
@@ -73,9 +75,9 @@ bin/export-ignore check --json
 By default, the tool uses a predefined set of patterns to check. You can provide your own config file:
 
 ```bash
-bin/export-ignore check --config=/path/to/config.php
+vendor/bin/dist-size-optimizer check --config=/path/to/config.php
 # or using short option
-bin/export-ignore check -c /path/to/config.php
+vendor/bin/dist-size-optimizer check -c /path/to/config.php
 ```
 
 The config file should be a PHP file that returns an array of patterns to check:

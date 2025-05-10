@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\PackageManager;
+namespace SavinMikhail\DistSizeOptimizer\PackageManager;
 
 use RuntimeException;
 
@@ -54,34 +54,19 @@ final readonly class PackageManager
         $dir = self::WORK_DIR . '/current-project';
         @mkdir(directory: $dir, permissions: 0o777, recursive: true);
 
-        // Get the current git root directory
-        exec(command: 'git rev-parse --show-toplevel', output: $output, result_code: $exitCode);
-        if ($exitCode !== 0) {
-            throw new RuntimeException(message: 'Not a git repository');
-        }
-        $gitRoot = trim(string: $output[0]);
+        exec(command: "git archive --format=tar HEAD | tar -x -C {$dir} 2>&1", output: $output, result_code: $exitCode);
 
-        // Create archive
-        $archivePath = $dir . '/archive.tar';
-        exec(command: "cd {$gitRoot} && git archive --format=tar HEAD -o {$archivePath}", output: $output, result_code: $exitCode);
         if ($exitCode !== 0) {
-            throw new RuntimeException(message: 'Failed to create git archive');
+            throw new RuntimeException(message: 'Failed to create git archive: ' . implode(separator: "\n", array: $output));
         }
-
-        // Extract archive
-        exec(command: "cd {$dir} && tar xf {$archivePath}", output: $output, result_code: $exitCode);
-        if ($exitCode !== 0) {
-            throw new RuntimeException(message: 'Failed to extract git archive');
-        }
-
-        // Clean up archive file
-        unlink(filename: $archivePath);
 
         return $dir;
     }
 
     public function cleanup(): void
     {
-        exec(command: 'rm -rf ' . escapeshellarg(arg: self::WORK_DIR));
+        if (is_dir(filename: self::WORK_DIR)) {
+            exec(command: 'rm -rf ' . escapeshellarg(arg: self::WORK_DIR));
+        }
     }
 }

@@ -1,6 +1,6 @@
 {
-    "name": "savinmikhail/export-ignore-check",
-    "description": "Checks that you have all non-production files excluded from dist",
+    "name": "savinmikhail/dist-size-optimizer",
+    "description": "Optimizes your package distribution size by automatically managing .gitattributes export-ignore rules",
     "license": "MIT",
     "require": {
         "php": "^8.2",
@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "SavinMikhail\\ExportIgnore\\": "src/"
+            "SavinMikhail\\DistSizeOptimizer\\": "src/"
         },
         "files": [
             "src/functions.php"
@@ -26,10 +26,10 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "SavinMikhail\\ExportIgnore\\Tests\\": "tests/"
+            "SavinMikhail\\DistSizeOptimizer\\Tests\\": "tests/"
         }
     },
     "bin": [
-        "bin/export-ignore"
+        "bin/dist-size-optimizer"
     ]
 }

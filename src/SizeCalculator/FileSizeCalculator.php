@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\SizeCalculator;
+namespace SavinMikhail\DistSizeOptimizer\SizeCalculator;
 
 use FilesystemIterator;
 use RecursiveDirectoryIterator;

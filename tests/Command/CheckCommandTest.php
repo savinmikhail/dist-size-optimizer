@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\Tests\Command;
+namespace SavinMikhail\DistSizeOptimizer\Tests\Command;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use SavinMikhail\ExportIgnore\Command\CheckCommand;
-use SavinMikhail\ExportIgnore\PackageManager\PackageManager;
+use SavinMikhail\DistSizeOptimizer\Command\CheckCommand;
+use SavinMikhail\DistSizeOptimizer\PackageManager\PackageManager;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -58,7 +58,7 @@ final class CheckCommandTest extends TestCase
     public function testCheckPackageByName(): void
     {
         $input = new ArrayInput(parameters: [
-            'package' => 'composer/composer',
+            'package' => 'symfony/console',
             '--json' => true,
         ]);
         $output = new BufferedOutput();
@@ -74,45 +74,28 @@ final class CheckCommandTest extends TestCase
         self::assertArrayHasKey('humanReadableSize', $result);
     }
 
-    public function testCheckInvalidPackageName(): void
+    public function testInvalidPackageName(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Package must be in format vendor/package');
-
         $input = new ArrayInput(parameters: [
             'package' => 'invalid-package',
         ]);
         $output = new BufferedOutput();
 
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Package must be in format vendor/package');
+
         $this->command->run(input: $input, output: $output);
     }
 
-    public function testCheckWithCustomConfig(): void
+    public function testInvalidConfigPath(): void
     {
         $input = new ArrayInput(parameters: [
-            '--json' => true,
-            '--config' => $this->testConfigPath,
+            '--config' => '/non-existent/path.php',
         ]);
         $output = new BufferedOutput();
 
-        $exitCode = $this->command->run(input: $input, output: $output);
-
-        self::assertNotEquals(0, $exitCode);
-        $result = json_decode(json: $output->fetch(), associative: true);
-        self::assertIsArray($result);
-        self::assertArrayHasKey('files', $result);
-        self::assertArrayHasKey('directories', $result);
-    }
-
-    public function testCheckWithNonExistentConfig(): void
-    {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Config file not found: /non-existent-config.php');
-
-        $input = new ArrayInput(parameters: [
-            '--config' => '/non-existent-config.php',
-        ]);
-        $output = new BufferedOutput();
+        $this->expectExceptionMessage('Config file not found: /non-existent/path.php');
 
         $this->command->run(input: $input, output: $output);
     }

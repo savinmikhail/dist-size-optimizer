@@ -9,3 +9,5 @@ test:
 
 rector:
 	vendor/bin/rector process
+
+quality: cs rector phpstan test

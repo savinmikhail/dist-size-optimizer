@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\Command;
+namespace SavinMikhail\DistSizeOptimizer\Command;
 
 use InvalidArgumentException;
-use SavinMikhail\ExportIgnore\Formatters\ConsoleReportFormatter;
-use SavinMikhail\ExportIgnore\Formatters\FormatterInterface;
-use SavinMikhail\ExportIgnore\Formatters\JsonReportFormatter;
-use SavinMikhail\ExportIgnore\PackageManager\PackageManager;
-use SavinMikhail\ExportIgnore\Scanner\ExportIgnoreScanner;
-use SavinMikhail\ExportIgnore\SizeCalculator\FileSizeCalculator;
-use SavinMikhail\ExportIgnore\GitAttributesManager\GitAttributesManager;
+use SavinMikhail\DistSizeOptimizer\Formatters\ConsoleReportFormatter;
+use SavinMikhail\DistSizeOptimizer\Formatters\FormatterInterface;
+use SavinMikhail\DistSizeOptimizer\Formatters\JsonReportFormatter;
+use SavinMikhail\DistSizeOptimizer\GitAttributesManager\GitAttributesManager;
+use SavinMikhail\DistSizeOptimizer\PackageManager\PackageManager;
+use SavinMikhail\DistSizeOptimizer\Scanner\ExportIgnoreScanner;
+use SavinMikhail\DistSizeOptimizer\SizeCalculator\FileSizeCalculator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function count;
-use function SavinMikhail\ExportIgnore\formatBytes;
+use function SavinMikhail\DistSizeOptimizer\formatBytes;
 
 final class CheckCommand extends Command
 {
@@ -116,7 +116,7 @@ final class CheckCommand extends Command
             );
 
             if (!$isDryRun && $package === null) {
-                $this->gitAttributesManager->appendPatterns($violatingFilesAndDirs);
+                $this->gitAttributesManager->appendPatterns(violatingFilesAndDirs: $violatingFilesAndDirs);
                 $output->writeln('<info>Patterns have been added to .gitattributes</info>');
             } elseif (!$isDryRun) {
                 $output->writeln('<comment>Note: --dry-run is ignored when checking a specific package</comment>');

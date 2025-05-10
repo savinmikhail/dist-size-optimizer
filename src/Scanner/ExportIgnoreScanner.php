@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SavinMikhail\ExportIgnore\Scanner;
+namespace SavinMikhail\DistSizeOptimizer\Scanner;
 
 use Symfony\Component\Finder\Finder;
 
