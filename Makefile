@@ -10,4 +10,8 @@ test:
 rector:
 	vendor/bin/rector process
 
-quality: cs rector phpstan test
+composer-normalize:
+	composer normalize
+
+quality: cs rector composer-normalize phpstan test
+

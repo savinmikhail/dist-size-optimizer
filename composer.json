@@ -8,13 +8,14 @@
         "symfony/finder": "^7.2"
     },
     "require-dev": {
+        "ergebnis/composer-normalize": "^2.47",
         "friendsofphp/php-cs-fixer": "^3.75",
-        "symfony/var-dumper": "^7.2",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^10.5",
         "phpyh/coding-standard": "^2.6",
-        "phpstan/phpstan": "^2.1",
         "rector/rector": "^2.0",
-        "savinmikhail/add_named_arguments_rector": "^0.1.16"
+        "savinmikhail/add_named_arguments_rector": "^0.1.16",
+        "symfony/var-dumper": "^7.2"
     },
     "autoload": {
         "psr-4": {
@@ -31,5 +32,10 @@
     },
     "bin": [
         "bin/dist-size-optimizer"
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true
+        }
+    }
 }
