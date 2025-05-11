@@ -29,7 +29,7 @@ final class CheckCommand extends Command
         private readonly ExportIgnoreScanner $scanner = new ExportIgnoreScanner(),
         private readonly FileSizeCalculator $calculator = new FileSizeCalculator(),
         private FormatterInterface $formatter = new ConsoleReportFormatter(),
-        private readonly PackageManager $packageManager = new PackageManager(),
+        private PackageManager $packageManager = new PackageManager(),
         private readonly GitAttributesManager $gitAttributesManager = new GitAttributesManager(),
     ) {
         parent::__construct();
@@ -59,6 +59,12 @@ final class CheckCommand extends Command
                 default: self::DEFAULT_CONFIG,
             )
             ->addOption(
+                name: 'workdir',
+                shortcut: 'w',
+                mode: InputOption::VALUE_OPTIONAL,
+                description: 'Path to project workdir',
+            )
+            ->addOption(
                 name: 'dry-run',
                 shortcut: null,
                 mode: InputOption::VALUE_NONE,
@@ -71,10 +77,13 @@ final class CheckCommand extends Command
         $package = $input->getArgument('package');
         $configPath = $input->getOption('config');
         $isDryRun = $input->getOption('dry-run');
+        $workdir = $input->getOption('workdir');
 
         if (!file_exists(filename: $configPath)) {
             throw new InvalidArgumentException(message: "Config file not found: {$configPath}");
         }
+
+        $this->packageManager->setWorkdir($workdir);
 
         try {
             if ($package === null) {

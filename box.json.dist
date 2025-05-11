@@ -1,0 +1,21 @@
+{
+    "chmod": "0755",
+    "directories": [
+        "."
+    ],
+    "files": [
+        "LICENSE"
+    ],
+    "finder": [
+        {
+            "name": "*.php",
+            "exclude": ["tests"],
+            "in": "vendor"
+        }
+    ],
+    "compression": "GZ",
+    "git-version": "package_version",
+    "main":        "bin/dist-size-optimizer",
+    "output":      "dist-size-optimizer.phar",
+    "stub":        true
+}
