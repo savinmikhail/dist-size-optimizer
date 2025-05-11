@@ -33,8 +33,11 @@ final readonly class PackageManager
                 "require": {
                     "{$packageName}": "*"
                 },
-                "minimum-stability": "stable",
-                "prefer-stable": true
+                "minimum-stability": "dev",
+                "prefer-stable": true,
+                 "config": {
+                    "allow-plugins": false
+                }
             }
             JSON;
 
