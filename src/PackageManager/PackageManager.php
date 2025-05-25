@@ -6,6 +6,8 @@ namespace SavinMikhail\DistSizeOptimizer\PackageManager;
 
 use RuntimeException;
 
+use const DIRECTORY_SEPARATOR;
+
 final readonly class PackageManager
 {
     private string $workdir;
@@ -13,7 +15,7 @@ final readonly class PackageManager
     public function setWorkdir(?string $workdir = null): void
     {
         if (!$workdir) {
-            $workdir = \sys_get_temp_dir() . DIRECTORY_SEPARATOR . \md5(\microtime());
+            $workdir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(string: microtime());
         }
         $this->workdir = $workdir;
 

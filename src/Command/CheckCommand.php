@@ -29,7 +29,7 @@ final class CheckCommand extends Command
         private readonly ExportIgnoreScanner $scanner = new ExportIgnoreScanner(),
         private readonly FileSizeCalculator $calculator = new FileSizeCalculator(),
         private FormatterInterface $formatter = new ConsoleReportFormatter(),
-        private PackageManager $packageManager = new PackageManager(),
+        private readonly PackageManager $packageManager = new PackageManager(),
         private readonly GitAttributesManager $gitAttributesManager = new GitAttributesManager(),
     ) {
         parent::__construct();
@@ -69,11 +69,25 @@ final class CheckCommand extends Command
                 shortcut: null,
                 mode: InputOption::VALUE_NONE,
                 description: 'Only show what would be added to .gitattributes without making changes',
+            )
+            ->addOption(
+                name: 'clean',
+                shortcut: null,
+                mode: InputOption::VALUE_NONE,
+                description: 'Clean .gitattributes of non-existent entries',
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ($input->getOption('clean')) {
+            $output->writeln('<info>Cleaning .gitattributes of stale patterns...</info>');
+            $this->gitAttributesManager->cleanPatterns();
+            $output->writeln('<info>Cleanup complete!</info>');
+
+            return Command::SUCCESS;
+        }
+
         $package = $input->getArgument('package');
         $configPath = $input->getOption('config');
         $isDryRun = $input->getOption('dry-run');
@@ -83,7 +97,7 @@ final class CheckCommand extends Command
             throw new InvalidArgumentException(message: "Config file not found: {$configPath}");
         }
 
-        $this->packageManager->setWorkdir($workdir);
+        $this->packageManager->setWorkdir(workdir: $workdir);
 
         try {
             if ($package === null) {
@@ -97,12 +111,9 @@ final class CheckCommand extends Command
 
             $patterns = require $configPath;
 
-            $violatingFilesAndDirs = $this->scanner->scan(packagePath: $path, patterns: $patterns);
+            $violating = $this->scanner->scan(packagePath: $path, patterns: $patterns);
 
-            if (
-                count(value: $violatingFilesAndDirs['files']) === 0
-                && count(value: $violatingFilesAndDirs['directories']) === 0
-            ) {
+            if (count(value: $violating['files']) === 0 && count(value: $violating['directories']) === 0) {
                 $output->writeln('<info>No unnecessary files or directories found. All good!</info>');
 
                 return Command::SUCCESS;
@@ -110,22 +121,17 @@ final class CheckCommand extends Command
 
             $totalSize = $this->calculator->calculateTotalSize(
                 basePath: $path,
-                paths: array_merge($violatingFilesAndDirs['files'], $violatingFilesAndDirs['directories']),
+                paths: array_merge($violating['files'], $violating['directories']),
             );
             $humanSize = formatBytes(bytes: $totalSize);
 
             if ($input->getOption('json')) {
                 $this->formatter = new JsonReportFormatter();
             }
-            $this->formatter->output(
-                output: $output,
-                violatingFilesAndDirs: $violatingFilesAndDirs,
-                totalSizeBytes: $totalSize,
-                humanReadableSize: $humanSize,
-            );
+            $this->formatter->output($output, $violating, $totalSize, $humanSize);
 
             if (!$isDryRun && $package === null) {
-                $this->gitAttributesManager->appendPatterns(violatingFilesAndDirs: $violatingFilesAndDirs);
+                $this->gitAttributesManager->appendPatterns(violatingFilesAndDirs: $violating);
                 $output->writeln('<info>Patterns have been added to .gitattributes</info>');
             } elseif (!$isDryRun) {
                 $output->writeln('<comment>Note: --dry-run is ignored when checking a specific package</comment>');

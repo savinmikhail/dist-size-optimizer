@@ -24,6 +24,46 @@ final class GitAttributesManager
         $this->writeGitAttributes(content: $newContent);
     }
 
+    /**
+     * Удаляет из .gitattributes все записанные паттерны export-ignore,
+     * которые больше не соответствуют реальным файлам/папкам.
+     */
+    public function cleanPatterns(): void
+    {
+        $content = $this->readGitAttributes();
+        if ($content === '') {
+            // файл не существует или пуст — нечего чистить
+            return;
+        }
+
+        $lines = preg_split(pattern: '/\r?\n/', subject: $content);
+        $kept = [];
+
+        foreach ($lines as $line) {
+            $line = trim(string: $line);
+            if ($line === '' || !str_contains(haystack: $line, needle: self::EXPORT_IGNORE_PATTERN)) {
+                // оставляем пустые и “не-export-ignore” строки
+                $kept[] = $line;
+
+                continue;
+            }
+
+            // ожидаем формат "<путь> export-ignore"
+            [$path] = preg_split(pattern: '/\s+/', subject: $line, limit: 2);
+            // убираем возможные кавычки и ведущий слэш
+            $path = ltrim(string: $path, characters: '/');
+
+            // проверяем существование относительного пути
+            if (file_exists(filename: $path)) {
+                $kept[] = $line;
+            }
+        }
+
+        // собираем обратно, не забывая про переводы строк
+        $newContent = implode(separator: "\n", array: array_filter(array: $kept, callback: static fn($l) => $l !== '')) . "\n";
+        $this->writeGitAttributes(content: $newContent);
+    }
+
     private function generatePatterns(array $violatingFilesAndDirs): array
     {
         $patterns = [];
