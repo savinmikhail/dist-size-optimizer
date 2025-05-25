@@ -8,10 +8,10 @@ A command-line tool that helps you optimize your package distribution size by au
 
 When you publish a package to Packagist, Composer creates a distribution archive using `git archive`. Files and directories that are not needed in production (like tests, documentation, CI configs) should be excluded using `.gitattributes` export-ignore to:
 
-- Reduce package size
-- Speed up installation
-- Improve CI/CD pipeline performance
-- Keep production packages clean
+* Reduce package size
+* Speed up installation
+* Improve CI/CD pipeline performance
+* Keep production packages clean
 
 This tool helps you identify what should be excluded and can automatically fix your `.gitattributes` file.
 
@@ -19,16 +19,16 @@ This tool helps you identify what should be excluded and can automatically fix y
 
 1. As composer dependency:
 
-```bash
-composer require savinmikhail/dist-size-optimizer
-```
+   ```bash
+   composer require savinmikhail/dist-size-optimizer
+   ```
 
-2. Also, you can use standalone phar package:
+2. Or as standalone phar package:
 
-```bash
-box.phar compile
-./dist-size-optimizer.phar check
-```
+   ```bash
+   box.phar compile
+   ./dist-size-optimizer.phar check
+   ```
 
 ## Usage
 
@@ -41,6 +41,7 @@ vendor/bin/dist-size-optimizer check
 ```
 
 This will:
+
 1. Create a git archive of your project (simulating Packagist's distribution)
 2. Scan for files that should be excluded
 3. Show you what to add to your `.gitattributes` file
@@ -57,9 +58,24 @@ vendor/bin/dist-size-optimizer check vendor/package
 ```
 
 For example:
+
 ```bash
 vendor/bin/dist-size-optimizer check symfony/console
 ```
+
+### Clean .gitattributes
+
+If your `.gitattributes` file contains stale `export-ignore` entries copied from other projects, you can remove all non-existent paths with:
+
+```bash
+vendor/bin/dist-size-optimizer check --clean
+```
+
+This command will:
+
+1. Read your existing `.gitattributes` file
+2. Remove all lines with `export-ignore` patterns that no longer match any file or directory in the project
+3. Overwrite `.gitattributes` with the cleaned content
 
 ### Output Options
 
@@ -126,13 +142,13 @@ Files that should be excluded using export-ignore:
   • `/README.md`
 
 To fix this, add the following lines to your `.gitattributes` file:
-  /tests/	export-ignore
-  /docs/	export-ignore
-  /.github/	export-ignore
-  /.gitignore	export-ignore
-  /.editorconfig	export-ignore
-  /phpunit.xml.dist	export-ignore
-  /README.md	export-ignore
+  /tests/    export-ignore
+  /docs/     export-ignore
+  /.github/ export-ignore
+  /.gitignore export-ignore
+  /.editorconfig export-ignore
+  /phpunit.xml.dist export-ignore
+  /README.md export-ignore
 
 🌿 Your package size could be reduced by approximately 2.5 MB!
 🚀 This improves installation time, reduces archive size, and helps CI/CD pipelines.
