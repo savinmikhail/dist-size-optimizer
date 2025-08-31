@@ -10,14 +10,14 @@
     "require-dev": {
         "ergebnis/composer-normalize": "^2.47",
         "friendsofphp/php-cs-fixer": "^3.75",
+        "icanhazstring/composer-unused": "^0.9.3",
+        "maglnet/composer-require-checker": "^4.16",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^10.5",
         "phpyh/coding-standard": "^2.6",
         "rector/rector": "^2.0",
         "savinmikhail/add_named_arguments_rector": "^0.1.16",
-        "symfony/var-dumper": "^7.2",
-        "icanhazstring/composer-unused": "^0.9.3",
-        "maglnet/composer-require-checker": "^4.16"
+        "symfony/var-dumper": "^7.2"
     },
     "autoload": {
         "psr-4": {
