@@ -12,22 +12,22 @@ final class GitAttributesManagerTest extends TestCase
     public function testDirectoriesAreAppendedWithSingleSlash(): void
     {
         $tempDir = sys_get_temp_dir() . '/gitattributes_' . uniqid();
-        mkdir($tempDir);
+        mkdir(directory: $tempDir);
         $cwd = getcwd();
-        chdir($tempDir);
+        chdir(directory: $tempDir);
 
         try {
             $manager = new GitAttributesManager();
-            $manager->appendPatterns(['files' => [], 'directories' => ['/foo/']]);
+            $manager->appendPatterns(violatingFilesAndDirs: ['files' => [], 'directories' => ['/foo/']]);
 
-            $content = file_get_contents('.gitattributes');
+            $content = file_get_contents(filename: '.gitattributes');
             self::assertSame("/foo/ export-ignore\n", $content);
         } finally {
-            chdir($cwd);
-            if (file_exists($tempDir . '/.gitattributes')) {
-                unlink($tempDir . '/.gitattributes');
+            chdir(directory: $cwd);
+            if (file_exists(filename: $tempDir . '/.gitattributes')) {
+                unlink(filename: $tempDir . '/.gitattributes');
             }
-            rmdir($tempDir);
+            rmdir(directory: $tempDir);
         }
     }
 }

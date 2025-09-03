@@ -30,7 +30,7 @@ function loadAnalyzed(): array
     return json_decode(file_get_contents(ANALYZED_FILE), true, 512, JSON_THROW_ON_ERROR);
 }
 
-function fetchTopPackages(int $limit = 1000): array
+function fetchTopPackages(int $limit = 1_000): array
 {
     $packages = [];
     $perPage = 100;
