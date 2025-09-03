@@ -1,5 +1,7 @@
 # Dist Size Optimizer
 
+![dist-size status](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsavinmikhail%2Fdist-size-optimizer%2Fmain%2Fdist-size-status.json)
+
 A command-line tool that helps you optimize your package distribution size by automatically managing `.gitattributes` export-ignore rules.
 
 > **Note**: This package was previously known as `export-ignore-check`. The functionality remains the same, but the name better reflects its purpose of optimizing distribution size.
