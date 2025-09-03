@@ -73,7 +73,7 @@ final class GitAttributesManager
         }
 
         foreach ($violatingFilesAndDirs['directories'] as $directory) {
-            $patterns[] = $this->formatPattern(path: $directory . '/');
+            $patterns[] = $this->formatPattern(path: rtrim(string: $directory, characters: '/') . '/');
         }
 
         return array_unique(array: $patterns);
