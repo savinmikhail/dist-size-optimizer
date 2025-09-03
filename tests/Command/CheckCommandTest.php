@@ -7,6 +7,7 @@ namespace SavinMikhail\DistSizeOptimizer\Tests\Command;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use SavinMikhail\DistSizeOptimizer\Command\CheckCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -50,6 +51,25 @@ final class CheckCommandTest extends TestCase
         self::assertArrayHasKey('directories', $result);
         self::assertArrayHasKey('totalSizeBytes', $result);
         self::assertArrayHasKey('humanReadableSize', $result);
+    }
+
+    public function testAutomaticFixReturnsSuccess(): void
+    {
+        $originalAttributes = file_exists(filename: '.gitattributes') ? file_get_contents(filename: '.gitattributes') : '';
+
+        $input = new ArrayInput(parameters: [
+            '--config' => $this->testConfigPath,
+        ]);
+        $output = new BufferedOutput();
+
+        try {
+            $exitCode = $this->command->run(input: $input, output: $output);
+
+            self::assertSame(Command::SUCCESS, $exitCode);
+            self::assertStringContainsString('README.md export-ignore', (string) file_get_contents(filename: '.gitattributes'));
+        } finally {
+            file_put_contents(filename: '.gitattributes', data: $originalAttributes);
+        }
     }
 
     public function testCheckPackageByName(): void

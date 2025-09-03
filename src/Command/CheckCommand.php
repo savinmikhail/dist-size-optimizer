@@ -130,14 +130,17 @@ final class CheckCommand extends Command
             }
             $this->formatter->output($output, $violating, $totalSize, $humanSize);
 
+            $status = Command::FAILURE;
+
             if (!$isDryRun && $package === null) {
                 $this->gitAttributesManager->appendPatterns(violatingFilesAndDirs: $violating);
                 $output->writeln('<info>Patterns have been added to .gitattributes</info>');
+                $status = Command::SUCCESS;
             } elseif (!$isDryRun) {
                 $output->writeln('<comment>Note: --dry-run is ignored when checking a specific package</comment>');
             }
 
-            return Command::FAILURE;
+            return $status;
         } finally {
             $this->packageManager->cleanup();
         }
