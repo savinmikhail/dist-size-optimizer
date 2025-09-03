@@ -3,11 +3,14 @@
 declare(strict_types=1);
 
 return [
+    // <<< dirs
     '.github/',
     'tests/',
     'Tests/',
     'docs/',
-
+    // dirs >>>
+    
+    'dist-size-status.json',
     '.gitignore',
     '.editorconfig',
 
