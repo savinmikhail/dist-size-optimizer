@@ -7,7 +7,6 @@ namespace SavinMikhail\DistSizeOptimizer\Tests\Command;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use SavinMikhail\DistSizeOptimizer\Command\CheckCommand;
-use SavinMikhail\DistSizeOptimizer\PackageManager\PackageManager;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -15,23 +14,19 @@ final class CheckCommandTest extends TestCase
 {
     private CheckCommand $command;
 
-    private PackageManager $packageManager;
-
     private string $testConfigPath;
 
     protected function setUp(): void
     {
-        $this->packageManager = new PackageManager();
         $this->command = new CheckCommand();
 
         // Create a test config file
         $this->testConfigPath = sys_get_temp_dir() . '/test-export-ignore.php';
-        file_put_contents(filename: $this->testConfigPath, data: '<?php return ["tests/", ".gitignore"];');
+        file_put_contents(filename: $this->testConfigPath, data: '<?php return ["README.md"];');
     }
 
     protected function tearDown(): void
     {
-        $this->packageManager->cleanup();
         if (file_exists(filename: $this->testConfigPath)) {
             unlink(filename: $this->testConfigPath);
         }
@@ -41,6 +36,8 @@ final class CheckCommandTest extends TestCase
     {
         $input = new ArrayInput(parameters: [
             '--json' => true,
+            '--config' => $this->testConfigPath,
+            '--dry-run' => true,
         ]);
         $output = new BufferedOutput();
 
@@ -60,6 +57,8 @@ final class CheckCommandTest extends TestCase
         $input = new ArrayInput(parameters: [
             'package' => 'symfony/console',
             '--json' => true,
+            '--config' => $this->testConfigPath,
+            '--dry-run' => true,
         ]);
         $output = new BufferedOutput();
 
