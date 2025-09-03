@@ -32,6 +32,24 @@ This tool helps you identify what should be excluded and can automatically fix y
    ./dist-size-optimizer.phar check
    ```
 
+## Dist Size Badge
+
+Show the status of your distribution size with a badge. The badge is green when the package is optimized and red when it needs optimization:
+
+![dist-size optimized](https://img.shields.io/badge/dist--size-optimized-brightgreen)
+![dist-size needs optimization](https://img.shields.io/badge/dist--size-needs%20optimization-red)
+
+### Add badge to your project
+
+1. Copy the [dist-size workflow](.github/workflows/dist-size.yml) into your repository.
+2. Add the following snippet to your `README.md`, replacing `<USER>` and `<REPO>` with your repository details:
+
+   ```markdown
+   ![dist-size status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/<USER>/<REPO>/main/dist-size-status.json)
+   ```
+
+The workflow updates `dist-size-status.json`, and the badge reflects your repository's current status.
+
 ## Usage
 
 ### Check Current Project
