@@ -1,5 +1,6 @@
 # Dist Size Optimizer
-
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/savinmikhail/dist-size-optimizer/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/savinmikhail/dist-size-optimizer/?branch=main)
+[![Code Coverage](https://scrutinizer-ci.com/g/savinmikhail/dist-size-optimizer/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/savinmikhail/dist-size-optimizer/?branch=main)
 ![dist-size status](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsavinmikhail%2Fdist-size-optimizer%2Fmain%2Fdist-size-status.json)
 
 A command-line tool that helps you optimize your package distribution size by automatically managing `.gitattributes` export-ignore rules.
