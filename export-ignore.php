@@ -41,7 +41,9 @@ return [
     'composer-require-checker.json',
     'composer-unused.php',
     'infection.json5',
+    'infection.json',
     'infection.json5.dist',
+    'infection.json.dist',
 
     'Taskfile.yml',
     'Taskfile.yaml',
