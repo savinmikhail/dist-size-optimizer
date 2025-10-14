@@ -23,7 +23,7 @@ This tool helps you identify what should be excluded and can automatically fix y
 1. As composer dependency:
 
    ```bash
-   composer require savinmikhail/dist-size-optimizer
+   composer require --dev savinmikhail/dist-size-optimizer
    ```
 
 2. Or as standalone phar package:
