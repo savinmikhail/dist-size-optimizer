@@ -8,9 +8,10 @@ return [
     'tests/',
     'Tests/',
     'docs/',
+    'tools/', // often used with bamarni/composer-bin-plugin 
     // dirs >>>
     
-    'dist-size-status.json',
+    'dist-size-status.json', // used for badge "dist size optimized"
     '.gitignore',
     '.editorconfig',
 
@@ -40,6 +41,7 @@ return [
     'composer-require-checker.json',
     'composer-unused.php',
     'infection.json5',
+    'infection.json5.dist',
 
     'Taskfile.yml',
     'Taskfile.yaml',
