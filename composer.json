@@ -5,6 +5,7 @@
     "keywords": ["static analysis", "export-ignore", "dist", ".gitattributes"],
     "require": {
         "php": "^8.2",
+        "composer/xdebug-handler": "^3.0",
         "symfony/console": "^7.2",
         "symfony/finder": "^7.2"
     },
