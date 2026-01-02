@@ -2,6 +2,7 @@
     "name": "savinmikhail/dist-size-optimizer",
     "description": "Optimizes your package distribution size by automatically managing .gitattributes export-ignore rules",
     "license": "MIT",
+    "keywords": ["static analysis", "export-ignore", "dist", ".gitattributes"],
     "require": {
         "php": "^8.2",
         "symfony/console": "^7.2",
