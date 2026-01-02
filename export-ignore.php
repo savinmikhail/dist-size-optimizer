@@ -8,9 +8,9 @@ return [
     'tests/',
     'Tests/',
     'docs/',
-    'tools/', // often used with bamarni/composer-bin-plugin 
+    'tools/', // often used with bamarni/composer-bin-plugin
     // dirs >>>
-    
+
     'dist-size-status.json', // used for badge "dist size optimized"
     '.gitignore',
     '.editorconfig',
