@@ -1,8 +1,18 @@
 {
     "name": "savinmikhail/dist-size-optimizer",
-    "description": "Optimizes your package distribution size by automatically managing .gitattributes export-ignore rules",
+    "description": "PHP CLI for reducing Composer package distribution size by managing .gitattributes export-ignore rules.",
     "license": "MIT",
-    "keywords": ["static analysis", "export-ignore", "dist", ".gitattributes"],
+    "keywords": [
+        ".gitattributes",
+        "composer",
+        "dev",
+        "distribution",
+        "export-ignore",
+        "git archive",
+        "package size",
+        "packagist",
+        "static analysis"
+    ],
     "require": {
         "php": "^8.2",
         "composer/xdebug-handler": "^3.0",
