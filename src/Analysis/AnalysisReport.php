@@ -9,9 +9,9 @@ use function usort;
 final readonly class AnalysisReport
 {
     /**
-     * @param array<string, array{status: string, packageMetadata: null|array{name: string, version: string, sourceUrl: null|string, sourceReference: null|string, distUrl: null|string, distReference: null|string}, details: null|array{files: string[], directories: string[], suggestions: string[], totalSizeBytes: int, humanReadableSize: string}, error?: string}> $results
+     * @param array<string, array{status: string, packageMetadata: null|array{name: string, version: string, sourceUrl: null|string, sourceReference: null|string, distUrl: null|string, distReference: null|string}, details: null|array{files: string[], directories: string[], suggestions: string[], totalSizeBytes: int, humanReadableSize: string, pathSizes: array<string, int>}, error?: string}> $results
      *
-     * @return list<array{package: string, packageMetadata: array{name: string, version: string, sourceUrl: null|string, sourceReference: null|string, distUrl: null|string, distReference: null|string}, files: string[], directories: string[], suggestions: string[], totalSizeBytes: int, humanReadableSize: string}>
+     * @return list<array{package: string, packageMetadata: array{name: string, version: string, sourceUrl: null|string, sourceReference: null|string, distUrl: null|string, distReference: null|string}, files: string[], directories: string[], suggestions: string[], totalSizeBytes: int, humanReadableSize: string, pathSizes: array<string, int>}>
      */
     public function rankCandidates(array $results): array
     {

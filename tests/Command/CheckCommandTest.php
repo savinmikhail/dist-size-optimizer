@@ -52,6 +52,7 @@ final class CheckCommandTest extends TestCase
         self::assertArrayHasKey('directories', $result);
         self::assertArrayHasKey('totalSizeBytes', $result);
         self::assertArrayHasKey('humanReadableSize', $result);
+        self::assertArrayHasKey('pathSizes', $result);
     }
 
     public function testAutomaticFixReturnsSuccess(): void
@@ -94,9 +95,12 @@ final class CheckCommandTest extends TestCase
         self::assertArrayHasKey('directories', $result);
         self::assertArrayHasKey('totalSizeBytes', $result);
         self::assertArrayHasKey('humanReadableSize', $result);
-        self::assertSame('symfony/console', $packageManager->getPackageMetadata()['name'] ?? null);
-        self::assertNotEmpty($packageManager->getPackageMetadata()['version'] ?? null);
-        self::assertNotEmpty($packageManager->getPackageMetadata()['sourceReference'] ?? null);
+        self::assertArrayHasKey('pathSizes', $result);
+        $packageMetadata = $packageManager->getPackageMetadata();
+        self::assertIsArray($packageMetadata);
+        self::assertSame('symfony/console', $packageMetadata['name']);
+        self::assertNotEmpty($packageMetadata['version']);
+        self::assertNotEmpty($packageMetadata['sourceReference']);
     }
 
     public function testInvalidPackageName(): void

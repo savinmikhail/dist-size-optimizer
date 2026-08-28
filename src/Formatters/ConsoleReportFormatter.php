@@ -8,7 +8,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class ConsoleReportFormatter implements FormatterInterface
 {
-    public function output(OutputInterface $output, array $violatingFilesAndDirs, int $totalSizeBytes, string $humanReadableSize): void
+    /**
+     * @param array{files: list<string>, directories: list<string>} $violatingFilesAndDirs
+     * @param array<string, int>                                    $pathSizes
+     */
+    public function output(OutputInterface $output, array $violatingFilesAndDirs, int $totalSizeBytes, string $humanReadableSize, array $pathSizes = []): void
     {
         if (!empty($violatingFilesAndDirs['directories'])) {
             $output->writeln('<error>Directories that should be excluded using export-ignore:</error>');

@@ -32,7 +32,7 @@ final class AnalysisReportTest extends TestCase
         self::assertSame([], new AnalysisReport()->rankCandidates(results: ['vendor/package' => $result]));
     }
 
-    /** @return array{status: string, packageMetadata: array{name: string, version: string, sourceUrl: string, sourceReference: string, distUrl: null, distReference: null}, details: array{files: string[], directories: string[], suggestions: string[], totalSizeBytes: int, humanReadableSize: string}} */
+    /** @return array{status: string, packageMetadata: array{name: string, version: string, sourceUrl: string, sourceReference: string, distUrl: null, distReference: null}, details: array{files: string[], directories: string[], suggestions: string[], totalSizeBytes: int, humanReadableSize: string, pathSizes: array<string, int>}} */
     private function candidate(int $size): array
     {
         return [
@@ -44,6 +44,7 @@ final class AnalysisReportTest extends TestCase
                 'suggestions' => ["/tests\texport-ignore"],
                 'totalSizeBytes' => $size,
                 'humanReadableSize' => $size . ' B',
+                'pathSizes' => ['/tests/' => $size],
             ],
         ];
     }

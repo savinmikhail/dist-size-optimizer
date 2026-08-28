@@ -5,9 +5,7 @@ declare(strict_types=1);
 /**
  * Conservative patterns for automated third-party package analysis.
  *
- * Keep documentation and project-specific build files out of this list: they
- * may be unnecessary at runtime, but excluding them should remain a maintainer
- * decision. Every generated candidate still requires source-level review.
+ * Every generated candidate still requires source-level review.
  */
 return [
     '.github/',
@@ -38,4 +36,18 @@ return [
     'infection.json5.dist',
     'infection.json.dist',
     'ecs.php',
+
+    'composer.lock',
+    'Makefile',
+    'Taskfile.yml',
+    'Taskfile.yaml',
+    'Dockerfile',
+    '.dockerignore',
+    'docker-compose.yml',
+    'docker-compose.yaml',
+    'compose.yml',
+    'compose.yaml',
+    '.gitlab-ci.yml',
+    '.travis.yml',
+    '.styleci.yml',
 ];

@@ -8,7 +8,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class JsonReportFormatter implements FormatterInterface
 {
-    public function output(OutputInterface $output, array $violatingFilesAndDirs, int $totalSizeBytes, string $humanReadableSize): void
+    /**
+     * @param array{files: list<string>, directories: list<string>} $violatingFilesAndDirs
+     * @param array<string, int>                                    $pathSizes
+     */
+    public function output(OutputInterface $output, array $violatingFilesAndDirs, int $totalSizeBytes, string $humanReadableSize, array $pathSizes = []): void
     {
         $suggestions = array_map(
             callback: static fn(string $path) => rtrim(string: $path, characters: '/') . "\texport-ignore",
@@ -21,6 +25,7 @@ final readonly class JsonReportFormatter implements FormatterInterface
             'suggestions' => $suggestions,
             'totalSizeBytes' => $totalSizeBytes,
             'humanReadableSize' => $humanReadableSize,
+            'pathSizes' => $pathSizes,
         ];
 
         $output->writeln(json_encode(value: $data, flags: JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));

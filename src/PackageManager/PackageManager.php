@@ -20,7 +20,7 @@ final class PackageManager
     public function setWorkdir(?string $workdir = null): void
     {
         if (!$workdir) {
-            $workdir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(string: microtime());
+            $workdir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'dist-size-optimizer-' . bin2hex(string: random_bytes(length: 16));
         }
         $this->workdir = $workdir;
 

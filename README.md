@@ -62,14 +62,17 @@ optimizations in popular Packagist packages:
 make analyze-popular
 ```
 
-The script analyzes a fresh package set by default, ranks observations by the
-uncompressed size of conservative development-only paths, and writes the full
-report to `var/results.json`. Observations below 1 KiB remain in the report but
-are not treated as actionable candidates. Use `--min-bytes=0` to change that
-threshold, `--resume` to skip packages already stored in `var/analyzed.json`,
-or `--config=/path/to/config.php` to select another pattern set.
-The Make target defaults to 20 packages; override it with
-`POPULAR_LIMIT=100 make analyze-popular`.
+The script analyzes a fresh package set by default, uses four parallel Composer
+workers, ranks observations by the uncompressed size of development-only paths,
+and writes the full report to `var/results.json`. The default discovery profile
+classifies test, CI, Docker, Compose, and development-tool files as safe, while
+documentation, examples, demos, benchmarks, and tools require manual review.
+
+Observations below 1 KiB remain in the report but are not treated as actionable
+candidates. Use `POPULAR_LIMIT`, `POPULAR_MIN_BYTES`, or `POPULAR_CONCURRENCY`
+to override the Make defaults of 100 packages, 1 KiB, and four workers. Pass
+`--resume` directly to the PHP script to skip packages checkpointed with the
+same config fingerprint.
 
 Discovery results are leads, not ready-made pull requests. Before proposing a
 change, verify the exact source revision and compare real `git archive` output

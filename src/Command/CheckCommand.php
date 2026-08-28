@@ -19,6 +19,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function count;
+use function is_array;
+use function is_string;
 use function SavinMikhail\DistSizeOptimizer\formatBytes;
 
 final class CheckCommand extends Command
@@ -109,7 +111,19 @@ final class CheckCommand extends Command
                 $path = $this->packageManager->downloadPackage(packageName: $package);
             }
 
-            $patterns = require $configPath;
+            $configPatterns = require $configPath;
+            if (!is_array(value: $configPatterns)) {
+                throw new InvalidArgumentException(message: "Config file must return an array: {$configPath}");
+            }
+
+            $patterns = [];
+            foreach ($configPatterns as $pattern) {
+                if (!is_string(value: $pattern)) {
+                    throw new InvalidArgumentException(message: "Config patterns must be strings: {$configPath}");
+                }
+
+                $patterns[] = $pattern;
+            }
 
             $violating = $this->scanner->scan(packagePath: $path, patterns: $patterns);
 
@@ -119,16 +133,17 @@ final class CheckCommand extends Command
                 return Command::SUCCESS;
             }
 
-            $totalSize = $this->calculator->calculateTotalSize(
+            $pathSizes = $this->calculator->calculatePathSizes(
                 basePath: $path,
                 paths: array_merge($violating['files'], $violating['directories']),
             );
+            $totalSize = array_sum(array: $pathSizes);
             $humanSize = formatBytes(bytes: $totalSize);
 
             if ($input->getOption('json')) {
                 $this->formatter = new JsonReportFormatter();
             }
-            $this->formatter->output($output, $violating, $totalSize, $humanSize);
+            $this->formatter->output($output, $violating, $totalSize, $humanSize, $pathSizes);
 
             $status = Command::FAILURE;
 

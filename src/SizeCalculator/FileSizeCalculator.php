@@ -10,26 +10,49 @@ use RecursiveIteratorIterator;
 
 final readonly class FileSizeCalculator
 {
+    /** @param list<string> $paths */
     public function calculateTotalSize(string $basePath, array $paths): int
     {
-        $total = 0;
+        return array_sum(array: $this->calculatePathSizes(basePath: $basePath, paths: $paths));
+    }
+
+    /**
+     * @param list<string> $paths
+     *
+     * @return array<string, int>
+     */
+    public function calculatePathSizes(string $basePath, array $paths): array
+    {
+        $sizes = [];
+        $seenPaths = [];
 
         foreach ($paths as $path) {
-            $fullPath = $basePath . '/' . rtrim(string: (string) $path, characters: '/');
+            $fullPath = $basePath . '/' . rtrim(string: $path, characters: '/');
             if (!file_exists(filename: $fullPath)) {
                 continue;
             }
 
-            $total += $this->getSizeInBytes(path: $fullPath);
+            $realPath = realpath(path: $fullPath);
+            if ($realPath !== false && isset($seenPaths[$realPath])) {
+                continue;
+            }
+
+            if ($realPath !== false) {
+                $seenPaths[$realPath] = true;
+            }
+
+            $sizes[$path] = $this->getSizeInBytes(path: $fullPath);
         }
 
-        return $total;
+        return $sizes;
     }
 
     private function getSizeInBytes(string $path): int
     {
         if (is_file(filename: $path)) {
-            return filesize(filename: $path);
+            $size = filesize(filename: $path);
+
+            return $size === false ? 0 : $size;
         }
 
         $size = 0;
