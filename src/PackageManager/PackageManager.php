@@ -6,11 +6,16 @@ namespace SavinMikhail\DistSizeOptimizer\PackageManager;
 
 use RuntimeException;
 
+use function is_string;
+
 use const DIRECTORY_SEPARATOR;
 
-final readonly class PackageManager
+final class PackageManager
 {
     private string $workdir;
+
+    /** @var null|array{name: string, version: string, sourceUrl: null|string, sourceReference: null|string, distUrl: null|string, distReference: null|string} */
+    private ?array $packageMetadata = null;
 
     public function setWorkdir(?string $workdir = null): void
     {
@@ -26,6 +31,7 @@ final readonly class PackageManager
 
     public function downloadPackage(string $packageName): string
     {
+        $this->packageMetadata = null;
         $dir = $this->workdir . '/' . str_replace(search: '/', replace: '__', subject: $packageName);
         @mkdir(directory: $dir, permissions: 0o777, recursive: true);
 
@@ -56,7 +62,15 @@ final readonly class PackageManager
             throw new RuntimeException(message: "Package {$packageName} was not installed correctly");
         }
 
+        $this->packageMetadata = $this->readPackageMetadata(lockFile: $dir . '/composer.lock', packageName: $packageName);
+
         return $vendorPath;
+    }
+
+    /** @return null|array{name: string, version: string, sourceUrl: null|string, sourceReference: null|string, distUrl: null|string, distReference: null|string} */
+    public function getPackageMetadata(): ?array
+    {
+        return $this->packageMetadata;
     }
 
     public function createGitArchive(): string
@@ -78,5 +92,42 @@ final readonly class PackageManager
         if (is_dir(filename: $this->workdir)) {
             exec(command: 'rm -rf ' . escapeshellarg(arg: $this->workdir));
         }
+    }
+
+    /** @return array{name: string, version: string, sourceUrl: null|string, sourceReference: null|string, distUrl: null|string, distReference: null|string} */
+    private function readPackageMetadata(string $lockFile, string $packageName): array
+    {
+        $contents = file_get_contents(filename: $lockFile);
+        if ($contents === false) {
+            throw new RuntimeException(message: "Unable to read Composer lock file for {$packageName}");
+        }
+
+        $lock = json_decode(json: $contents, associative: true, flags: JSON_THROW_ON_ERROR);
+        foreach ($lock['packages'] ?? [] as $package) {
+            if (($package['name'] ?? null) !== $packageName) {
+                continue;
+            }
+
+            $version = $package['version'] ?? null;
+            if (!is_string(value: $version)) {
+                throw new RuntimeException(message: "Composer lock file has no version for {$packageName}");
+            }
+
+            return [
+                'name' => $packageName,
+                'version' => $version,
+                'sourceUrl' => $this->nullableString(value: $package['source']['url'] ?? null),
+                'sourceReference' => $this->nullableString(value: $package['source']['reference'] ?? null),
+                'distUrl' => $this->nullableString(value: $package['dist']['url'] ?? null),
+                'distReference' => $this->nullableString(value: $package['dist']['reference'] ?? null),
+            ];
+        }
+
+        throw new RuntimeException(message: "Composer lock file has no metadata for {$packageName}");
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        return is_string(value: $value) ? $value : null;
     }
 }

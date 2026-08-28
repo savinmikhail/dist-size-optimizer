@@ -5,6 +5,7 @@ parameters:
 	paths:
 		- src
 		- bin
+		- check-top-packagist.php
 	level: 8
 	parallel:
 		maximumNumberOfProcesses: 1

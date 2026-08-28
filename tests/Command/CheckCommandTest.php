@@ -7,6 +7,7 @@ namespace SavinMikhail\DistSizeOptimizer\Tests\Command;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use SavinMikhail\DistSizeOptimizer\Command\CheckCommand;
+use SavinMikhail\DistSizeOptimizer\PackageManager\PackageManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -74,6 +75,8 @@ final class CheckCommandTest extends TestCase
 
     public function testCheckPackageByName(): void
     {
+        $packageManager = new PackageManager();
+        $command = new CheckCommand(packageManager: $packageManager);
         $input = new ArrayInput(parameters: [
             'package' => 'symfony/console',
             '--json' => true,
@@ -82,7 +85,7 @@ final class CheckCommandTest extends TestCase
         ]);
         $output = new BufferedOutput();
 
-        $exitCode = $this->command->run(input: $input, output: $output);
+        $exitCode = $command->run(input: $input, output: $output);
 
         self::assertNotEquals(0, $exitCode);
         $result = json_decode(json: $output->fetch(), associative: true);
@@ -91,6 +94,9 @@ final class CheckCommandTest extends TestCase
         self::assertArrayHasKey('directories', $result);
         self::assertArrayHasKey('totalSizeBytes', $result);
         self::assertArrayHasKey('humanReadableSize', $result);
+        self::assertSame('symfony/console', $packageManager->getPackageMetadata()['name'] ?? null);
+        self::assertNotEmpty($packageManager->getPackageMetadata()['version'] ?? null);
+        self::assertNotEmpty($packageManager->getPackageMetadata()['sourceReference'] ?? null);
     }
 
     public function testInvalidPackageName(): void

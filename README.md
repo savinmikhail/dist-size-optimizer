@@ -53,6 +53,28 @@ The workflow updates `dist-size-status.json`, and the badge reflects your reposi
 
 ## Usage
 
+### Analyze Popular Packages
+
+The repository includes a conservative discovery script for finding potential
+optimizations in popular Packagist packages:
+
+```bash
+make analyze-popular
+```
+
+The script analyzes a fresh package set by default, ranks observations by the
+uncompressed size of conservative development-only paths, and writes the full
+report to `var/results.json`. Observations below 1 KiB remain in the report but
+are not treated as actionable candidates. Use `--min-bytes=0` to change that
+threshold, `--resume` to skip packages already stored in `var/analyzed.json`,
+or `--config=/path/to/config.php` to select another pattern set.
+The Make target defaults to 20 packages; override it with
+`POPULAR_LIMIT=100 make analyze-popular`.
+
+Discovery results are leads, not ready-made pull requests. Before proposing a
+change, verify the exact source revision and compare real `git archive` output
+before and after applying the suggested `.gitattributes` rules.
+
 ### Check Current Project
 
 To check your current project (recommended during development):
